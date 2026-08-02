@@ -132,9 +132,10 @@ select option{font-size:13px;padding:2px 6px}
 .pbar{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
 .pbar-fill{height:100%;border-radius:3px;transition:width .3s}
 
-.filter-bar{display:flex;gap:8px;align-items:center;flex-wrap:nowrap;margin-bottom:12px;overflow-x:auto;overflow-y:hidden}
-.filter-bar select,.filter-bar input{width:auto;min-width:0;flex:1 1 auto;max-width:45%}
-.filter-bar .search-box{flex:2 1 auto;min-width:0}
+.filter-bar{display:flex;gap:6px;align-items:center;flex-wrap:nowrap;margin-bottom:12px;width:100%}
+.filter-bar select{width:auto;min-width:0;flex:1 1 0;max-width:30%}
+.filter-bar .search-box{flex:2 1 0;min-width:0;width:100%}
+.filter-bar .search-box input{width:100%}
 .filter-bar::-webkit-scrollbar{display:none}
 
 .empty{text-align:center;padding:44px 20px;color:var(--text-light)}
@@ -177,10 +178,10 @@ select option{font-size:13px;padding:2px 6px}
 .tl-card .tl-body p{font-size:13px;margin-bottom:4px;line-height:1.6}
 .tl-card .tl-body .fl{font-weight:600;font-size:12px;margin-right:4px}
 
-.quick-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:7px}
-.quick-btn{display:flex;align-items:center;gap:7px;padding:9px 14px;border-radius:9px;background:var(--card);box-shadow:var(--shadow);cursor:pointer;transition:all .2s;border:1px solid transparent;font-size:13px}
+.quick-actions{display:flex;gap:6px;flex-wrap:nowrap;margin-bottom:7px;width:100%}
+.quick-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 10px;border-radius:9px;background:var(--card);box-shadow:var(--shadow);cursor:pointer;transition:all .2s;border:1px solid transparent;font-size:12px;flex:1;min-width:0;white-space:nowrap}
 .quick-btn:hover{border-color:var(--primary);transform:translateY(-1px);box-shadow:var(--shadow-lg)}
-.quick-btn .qi{font-size:17px}
+.quick-btn .qi{font-size:15px;flex-shrink:0}
 
 .thought-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px;margin-bottom:5px;transition:transform .2s,box-shadow .2s;border-left:3px solid transparent;width:100%;box-sizing:border-box}
 .thought-card:hover{transform:translateY(-1px);box-shadow:var(--shadow-lg)}
@@ -342,9 +343,9 @@ select option{font-size:13px;padding:2px 6px}
 .sidebar-toggle.dragging{opacity:.7;transition:none}
 .sidebar-toggle.draggable{touch-action:none;user-select:none;-webkit-user-select:none}
 
-@media(max-width:1024px){.grid-4{grid-template-columns:repeat(2,1fr)}.grid-3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:1024px){.grid-4{grid-template-columns:repeat(4,1fr)}.grid-3{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:768px){
-  .thoughts-stats{grid-template-columns:1fr!important}
+  .thoughts-stats{grid-template-columns:repeat(2,1fr)!important}
   .thoughts-stats .stat-card{width:100%}
   #sidebar{width:200px;transform:translateX(-100%);box-shadow:var(--shadow-lg)}
   body.sidebar-shown #sidebar{transform:translateX(0)}
@@ -363,15 +364,15 @@ select option{font-size:13px;padding:2px 6px}
   .sidebar-footer .gear{font-size:15px}
   .sidebar-toggle{left:12px;top:12px}
   #main{margin-left:0;padding:12px;padding-top:54px;max-width:100vw;overflow-x:hidden}
-  .grid-4{grid-template-columns:repeat(2,1fr)}
-  .grid-3{grid-template-columns:repeat(2,1fr)}
+  .grid-4{grid-template-columns:repeat(4,1fr)}
+  .grid-3{grid-template-columns:repeat(3,1fr)}
   .grid-2{grid-template-columns:repeat(2,1fr)}
   .form-row{flex-direction:column}
   .page-title{font-size:17px}
   .page-desc{font-size:12px;margin-bottom:4px}
-  .quick-actions{gap:6px;margin-bottom:10px}
-  .quick-btn{padding:7px 10px;font-size:12px}
-  .quick-btn .qi{font-size:14px}
+  .quick-actions{gap:5px;margin-bottom:10px}
+  .quick-btn{padding:7px 6px;font-size:11px;flex:1;min-width:0}
+  .quick-btn .qi{font-size:13px}
   .filter-bar{gap:4px}
   .filter-bar select,.filter-bar input{min-width:0;font-size:12px}
   .filter-bar .search-box{min-width:0}
@@ -413,10 +414,13 @@ select option{font-size:13px;padding:2px 6px}
 }
 @media(max-width:480px){
   #main{padding:10px}
-  .grid-2,.grid-3,.grid-4{grid-template-columns:repeat(2,1fr)}
+  .grid-2{grid-template-columns:repeat(2,1fr)}
+  .grid-3{grid-template-columns:repeat(3,1fr)}
+  .grid-4{grid-template-columns:repeat(4,1fr)}
   .page-title{font-size:16px}
-  .quick-actions{flex-direction:row;flex-wrap:wrap}
-  .quick-btn{width:auto;flex:1 1 calc(50% - 6px);min-width:130px;justify-content:center}
+  .quick-actions{flex-direction:row;flex-wrap:nowrap;gap:4px}
+  .quick-btn{width:auto;flex:1;min-width:0;padding:6px 4px;font-size:10px;justify-content:center}
+  .quick-btn .qi{font-size:12px}
   .stat-card{padding:12px 10px;gap:10px}
   .stat-card .stat-icon{width:34px;height:34px;font-size:15px}
   .stat-card .stat-info .num{font-size:20px}
@@ -3378,8 +3382,9 @@ const App = {
     const deleting=this._deletingCatIdx;
     let html='<div style="margin-bottom:14px;font-size:12px;color:var(--text-sec)">可新增、编辑、删除分类维度。</div>';
     // Inline add
-    html+='<div style="display:flex;gap:8px;margin-bottom:14px">'+
-      '<input type="text" id="newCatName" placeholder="输入新分类名称..." style="flex:1">'+
+    html+='<div style="display:flex;gap:8px;margin-bottom:14px;align-items:center;flex-wrap:wrap">'+
+      '<input type="text" id="newCatName" placeholder="输入新分类名称..." style="flex:1;min-width:120px">'+
+      '<input type="color" id="newCatColor" value="#2E8B7A" style="width:32px;height:32px;border:none;border-radius:6px;cursor:pointer;padding:0" title="选择颜色">'+
       '<button class="btn btn-primary btn-sm" onclick="App.addCategoryInline()">添加</button>'+
     '</div>';
     // Category list
@@ -3414,8 +3419,8 @@ const App = {
     const label=input.value.trim();
     if(!label){this.toast('请输入分类名称','error');return}
     const key='cat_'+Date.now().toString(36);
-    const colors=['#2E8B7A','#4AA898','#E8B84B','#E07070','#7B8EC8','#6BBFB0'];
-    const color=colors[Math.floor(Math.random()*colors.length)];
+    const colorInput=document.getElementById('newCatColor');
+    const color=colorInput?colorInput.value:'#2E8B7A';
     this.data.categories.push({key,label,color});
     this.saveData();this.toast('分类已添加','success');
     this.renderCategoryMgmtContent();
@@ -3997,17 +4002,15 @@ const App = {
     el.innerHTML=this.data.projects.length?this.data.projects.map(p=>{
       const subs=this.subByProj(p.id);
       let html='<div class="pmg-item" style="padding:10px 14px;background:var(--bg);border-radius:8px;margin-bottom:8px">'+
-        '<div class="proj-mgmt-row pmg-header" style="display:flex;align-items:center;gap:8px">'+
-          '<span class="tag '+this.catCls(p.category)+'" style="'+this.catTagStyle(p.category)+'">'+this.catLabel(p.category)+'</span>'+
+        '<div class="proj-mgmt-row pmg-header" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">'+
+          '<span class="tag '+this.catCls(p.category)+'" style="'+this.catTagStyle(p.category)+';font-size:10px">'+this.catLabel(p.category)+'</span>'+
           '<span class="proj-name" style="flex:1;font-size:13px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+this.esc(p.name)+'</span>'+
-        '</div>'+
-        '<div class="pmg-actions" style="display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap">'+
           '<span class="tag '+this.statusCls(p.status)+'" style="font-size:10px">'+p.status+'</span>'+
-          '<span style="font-size:11px;color:var(--text-light)">'+subs.length+'子任务</span>'+
-          '<div class="proj-mgmt-btns" style="display:flex;gap:6px;margin-left:auto">'+
-            '<button class="btn btn-ghost btn-sm" onclick="App.openSubtaskModal(\''+p.id+'\')">+ 子任务</button>'+
-            '<button class="btn btn-ghost btn-sm" onclick="App.openProjectModal(\''+p.id+'\')">编辑</button>'+
-            '<button class="btn btn-ghost btn-sm" onclick="App.delProject(\''+p.id+'\')" style="color:var(--danger)">删除</button>'+
+          '<span style="font-size:10px;color:var(--text-light)">'+subs.length+'子任务</span>'+
+          '<div class="proj-mgmt-btns" style="display:flex;gap:4px">'+
+            '<button class="btn btn-ghost btn-sm" onclick="App.openSubtaskModal(\''+p.id+'\')" style="font-size:10px;padding:3px 8px">+ 子任务</button>'+
+            '<button class="btn btn-ghost btn-sm" onclick="App.openProjectModal(\''+p.id+'\')" style="font-size:10px;padding:3px 8px">编辑</button>'+
+            '<button class="btn btn-ghost btn-sm" onclick="App.delProject(\''+p.id+'\')" style="color:var(--danger);font-size:10px;padding:3px 8px">删除</button>'+
           '</div>'+
         '</div>';
       if(subs.length){
@@ -4036,16 +4039,14 @@ const App = {
     const renderProjItem=(p)=>{
       const subs=this.subByProj(p.id);
       let h='<div class="pmg-item" style="padding:10px 14px;background:var(--bg);border-radius:8px;margin-bottom:8px">'+
-        '<div class="proj-mgmt-row pmg-header" style="display:flex;align-items:center;gap:8px">'+
+        '<div class="proj-mgmt-row pmg-header" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">'+
           '<span class="proj-name" style="flex:1;font-size:13px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+this.esc(p.name)+'</span>'+
-        '</div>'+
-        '<div class="pmg-actions" style="display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap">'+
           '<span class="tag '+this.statusCls(p.status)+'" style="font-size:10px">'+p.status+'</span>'+
-          '<span style="font-size:11px;color:var(--text-light)">'+subs.length+'子任务</span>'+
-          '<div class="proj-mgmt-btns" style="display:flex;gap:6px;margin-left:auto">'+
-            '<button class="btn btn-ghost btn-sm" onclick="App.openSubtaskModal(\''+p.id+'\')">+ 子任务</button>'+
-            '<button class="btn btn-ghost btn-sm" onclick="App.openProjectModal(\''+p.id+'\')">编辑</button>'+
-            '<button class="btn btn-ghost btn-sm" onclick="App.delProject(\''+p.id+'\')" style="color:var(--danger)">删除</button>'+
+          '<span style="font-size:10px;color:var(--text-light)">'+subs.length+'子任务</span>'+
+          '<div class="proj-mgmt-btns" style="display:flex;gap:4px">'+
+            '<button class="btn btn-ghost btn-sm" onclick="App.openSubtaskModal(\''+p.id+'\')" style="font-size:10px;padding:3px 8px">+ 子任务</button>'+
+            '<button class="btn btn-ghost btn-sm" onclick="App.openProjectModal(\''+p.id+'\')" style="font-size:10px;padding:3px 8px">编辑</button>'+
+            '<button class="btn btn-ghost btn-sm" onclick="App.delProject(\''+p.id+'\')" style="color:var(--danger);font-size:10px;padding:3px 8px">删除</button>'+
           '</div>'+
         '</div>';
       if(subs.length){
@@ -4093,13 +4094,20 @@ const App = {
 
   /* ---- Category Management ---- */
   addCategory(){
-    const colors=['#2E8B7A','#4AA898','#E8B84B','#E07070','#7B8EC8','#6BBFB0'];
+    const colors=['#2E8B7A','#4AA898','#E8B84B','#E07070','#7B8EC8','#6BBFB0','#3DAA8A','#C8A43A','#9B8BB5','#E8743B'];
     const color=colors[Math.floor(Math.random()*colors.length)];
     this.showModal('➕ 新增分类',
       '<div class="form-group"><label>分类名称 <span class="opt">*</span></label><input type="text" id="newCatName" placeholder="请输入分类名称" autofocus></div>'+
-      '<div class="form-group"><label>分类颜色</label><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px" id="colorPicker">'+
-        colors.map((c,i)=>'<span onclick="App._selectCatColor(\''+c+'\')" data-color="'+c+'" style="width:32px;height:32px;border-radius:8px;background:'+c+';cursor:pointer;border:3px solid '+(i===0?'var(--primary)':'transparent')+';transition:border-color .2s"></span>').join('')+
-      '</div></div>'+
+      '<div class="form-group"><label>分类颜色</label>'+
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px" id="colorPicker">'+
+          colors.map((c,i)=>'<span onclick="App._selectCatColor(\''+c+'\')" data-color="'+c+'" style="width:32px;height:32px;border-radius:8px;background:'+c+';cursor:pointer;border:3px solid '+(i===0?'var(--primary)':'transparent')+';transition:border-color .2s"></span>').join('')+
+        '</div>'+
+        '<div style="display:flex;align-items:center;gap:8px">'+
+          '<span style="font-size:12px;color:var(--text-sec)">自定义颜色：</span>'+
+          '<input type="color" id="customColorPicker" value="'+color+'" style="width:36px;height:36px;border:none;border-radius:8px;cursor:pointer;padding:0" onchange="App._selectCatColor(this.value)">'+
+          '<span id="customColorValue" style="font-size:12px;color:var(--text-light);font-family:monospace">'+color+'</span>'+
+        '</div>'+
+      '</div>'+
       '<div class="modal-actions"><button class="btn btn-ghost" onclick="App.closeModal()">取消</button>'+
       '<button class="btn btn-primary" onclick="App._saveNewCategory()">添加</button></div>');
     this._pendingCatColor=color;
@@ -4109,6 +4117,10 @@ const App = {
     document.querySelectorAll('#colorPicker span').forEach(s=>{
       s.style.borderColor=s.dataset.color===c?'var(--primary)':'transparent';
     });
+    const colorPicker=document.getElementById('customColorPicker');
+    if(colorPicker)colorPicker.value=c;
+    const colorValue=document.getElementById('customColorValue');
+    if(colorValue)colorValue.textContent=c;
   },
   _saveNewCategory(){
     const el=document.getElementById('newCatName');
@@ -4124,12 +4136,19 @@ const App = {
   editCategory(idx){
     const cat=this.data.categories[idx];
     if(!cat)return;
-    const colors=['#2E8B7A','#4AA898','#E8B84B','#E07070','#7B8EC8','#6BBFB0'];
+    const colors=['#2E8B7A','#4AA898','#E8B84B','#E07070','#7B8EC8','#6BBFB0','#3DAA8A','#C8A43A','#9B8BB5','#E8743B'];
     this.showModal('✏️ 编辑分类',
       '<div class="form-group"><label>分类名称 <span class="opt">*</span></label><input type="text" id="editCatName" value="'+this.esc(cat.label)+'" autofocus></div>'+
-      '<div class="form-group"><label>分类颜色</label><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px" id="colorPicker">'+
-        colors.map(c=>'<span onclick="App._selectCatColor(\''+c+'\')" data-color="'+c+'" style="width:32px;height:32px;border-radius:8px;background:'+c+';cursor:pointer;border:3px solid '+(c===cat.color?'var(--primary)':'transparent')+';transition:border-color .2s"></span>').join('')+
-      '</div></div>'+
+      '<div class="form-group"><label>分类颜色</label>'+
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px" id="colorPicker">'+
+          colors.map(c=>'<span onclick="App._selectCatColor(\''+c+'\')" data-color="'+c+'" style="width:32px;height:32px;border-radius:8px;background:'+c+';cursor:pointer;border:3px solid '+(c===cat.color?'var(--primary)':'transparent')+';transition:border-color .2s"></span>').join('')+
+        '</div>'+
+        '<div style="display:flex;align-items:center;gap:8px">'+
+          '<span style="font-size:12px;color:var(--text-sec)">自定义颜色：</span>'+
+          '<input type="color" id="customColorPicker" value="'+cat.color+'" style="width:36px;height:36px;border:none;border-radius:8px;cursor:pointer;padding:0" onchange="App._selectCatColor(this.value)">'+
+          '<span id="customColorValue" style="font-size:12px;color:var(--text-light);font-family:monospace">'+cat.color+'</span>'+
+        '</div>'+
+      '</div>'+
       '<div class="modal-actions"><button class="btn btn-ghost" onclick="App.closeModal()">取消</button>'+
       '<button class="btn btn-primary" onclick="App._saveEditCategory('+idx+')">保存</button></div>');
     this._pendingCatColor=cat.color;

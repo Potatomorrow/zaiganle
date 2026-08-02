@@ -1,0 +1,42 @@
+{
+  "name": "在干了",
+  "short_name": "在干了",
+  "description": "个人生产力管理工具 - 记录灵感、追踪项目、管理待办",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F0F7F6",
+  "theme_color": "#2E8B7A",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiJgcng9IjM2IiBmaWxsPSIjMkVCOEI3QSIvPjx0ZXh0IHg9Ijk2IiB5PSIxMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTA4IiBmaWxsPSIjZmZmIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+5Zyo5a62PC90ZXh0Pjwvc3ZnPg==",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9Ijk2IiBmaWxsPSIjMkVCOEI3QSIvPjx0ZXh0IHg9IjI1NiIgeT0iMzQwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjI5NiIgZmlsbD0iI2ZmZiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiPuecoeabov+PC90ZXh0Pjwvc3ZnPg==",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "工作台总览",
+      "url": "./index.html?page=dashboard",
+      "description": "查看今日概览"
+    },
+    {
+      "name": "待办中心",
+      "url": "./index.html?page=todos",
+      "description": "管理待办事项"
+    },
+    {
+      "name": "实践手记",
+      "url": "./index.html?page=thoughts",
+      "description": "记录灵感与思考"
+    }
+  ]
+}
