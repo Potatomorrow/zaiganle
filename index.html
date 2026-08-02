@@ -507,6 +507,7 @@ select option{font-size:13px;padding:2px 6px}
       <span class="gear" onclick="App.resetData()" title="重置数据">🔄</span>
       <span class="gear" onclick="App.openSettingsModal()" title="设置">⚙</span>
       <span class="gear" id="cloudSyncBtn" onclick="CloudSync.openSettings()" title="云同步">☁</span>
+      <span class="gear" id="installBtn" onclick="PWAInstall.prompt()" title="安装到桌面">📲</span>
     </div>
   </aside>
   <div id="sidebar-backdrop"></div>
@@ -4799,11 +4800,35 @@ if('serviceWorker' in navigator){
 }
 // Make install prompt available
 let deferredPrompt=null;
+const PWAInstall={
+  prompt:function(){
+    if(deferredPrompt){
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(function(){
+        deferredPrompt=null;
+        PWAInstall._hideBtn();
+      });
+    }else{
+      alert('当前浏览器没有触发自动安装，请手动添加到桌面：\n\n【OPPO浏览器】\n点击底部 ☰ 菜单 → 添加到主屏幕\n\n【Chrome / Edge】\n点击地址栏右侧 ⋮ → 添加到主屏幕 / 安装应用');
+    }
+  },
+  _hideBtn:function(){
+    const b=document.getElementById('installBtn');
+    if(b) b.style.display='none';
+  }
+};
 window.addEventListener('beforeinstallprompt',function(e){
   e.preventDefault();
   deferredPrompt=e;
 });
-window.addEventListener('appinstalled',function(){deferredPrompt=null});
+window.addEventListener('appinstalled',function(){
+  deferredPrompt=null;
+  PWAInstall._hideBtn();
+});
+// 已安装（standalone 模式）则隐藏安装按钮
+if(window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true){
+  PWAInstall._hideBtn();
+}
 </script>
 </body>
 </html>
