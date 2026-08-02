@@ -2,7 +2,14 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#2E8B7A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="在干了">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiJgcng9IjM2IiBmaWxsPSIjMkVCOEI3QSIvPjx0ZXh0IHg9Ijk2IiB5PSIxMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTA4IiBmaWxsPSIjZmZmIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+5Zyo5a62PC90ZXh0Pjwvc3ZnPg==">
 <title>在干了</title>
 <style>
 :root{
@@ -125,8 +132,10 @@ select option{font-size:13px;padding:2px 6px}
 .pbar{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
 .pbar-fill{height:100%;border-radius:3px;transition:width .3s}
 
-.filter-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
-.filter-bar select,.filter-bar input{width:auto;min-width:130px}
+.filter-bar{display:flex;gap:8px;align-items:center;flex-wrap:nowrap;margin-bottom:12px;overflow-x:auto;overflow-y:hidden}
+.filter-bar select,.filter-bar input{width:auto;min-width:0;flex:1 1 auto;max-width:45%}
+.filter-bar .search-box{flex:2 1 auto;min-width:0}
+.filter-bar::-webkit-scrollbar{display:none}
 
 .empty{text-align:center;padding:44px 20px;color:var(--text-light)}
 .empty .icon{font-size:44px;margin-bottom:10px;opacity:.5}
@@ -173,7 +182,7 @@ select option{font-size:13px;padding:2px 6px}
 .quick-btn:hover{border-color:var(--primary);transform:translateY(-1px);box-shadow:var(--shadow-lg)}
 .quick-btn .qi{font-size:17px}
 
-.thought-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px;margin-bottom:5px;transition:transform .2s,box-shadow .2s;border-left:3px solid transparent}
+.thought-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px;margin-bottom:5px;transition:transform .2s,box-shadow .2s;border-left:3px solid transparent;width:100%;box-sizing:border-box}
 .thought-card:hover{transform:translateY(-1px);box-shadow:var(--shadow-lg)}
 .thought-card.starred{border-left-color:var(--warning)}
 .thought-card.insp-type{background:#FFF8F5;border-left-color:var(--primary-light)}
@@ -302,8 +311,9 @@ select option{font-size:13px;padding:2px 6px}
 .proj-detail-section{margin-bottom:14px}
 .proj-detail-section h3{font-size:14px;font-weight:700;margin-bottom:10px;color:var(--text);display:flex;align-items:center;gap:7px}
 
-.todo-filter-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
-.todo-filter-bar select{width:auto;min-width:120px}
+.todo-filter-bar{display:flex;gap:6px;align-items:center;flex-wrap:nowrap;margin-bottom:14px;overflow-x:auto;overflow-y:hidden}
+.todo-filter-bar select{width:auto;min-width:0;flex:1 1 auto;max-width:45%}
+.todo-filter-bar::-webkit-scrollbar{display:none}
 
 /* Settings: category list */
 .cat-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;margin-bottom:6px;background:var(--bg)}
@@ -334,6 +344,8 @@ select option{font-size:13px;padding:2px 6px}
 
 @media(max-width:1024px){.grid-4{grid-template-columns:repeat(2,1fr)}.grid-3{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:768px){
+  .thoughts-stats{grid-template-columns:1fr!important}
+  .thoughts-stats .stat-card{width:100%}
   #sidebar{width:200px;transform:translateX(-100%);box-shadow:var(--shadow-lg)}
   body.sidebar-shown #sidebar{transform:translateX(0)}
   body.sidebar-shown #sidebar-backdrop{opacity:1;visibility:visible}
@@ -360,8 +372,9 @@ select option{font-size:13px;padding:2px 6px}
   .quick-actions{gap:6px;margin-bottom:10px}
   .quick-btn{padding:7px 10px;font-size:12px}
   .quick-btn .qi{font-size:14px}
-  .filter-bar{gap:6px}
-  .filter-bar select,.filter-bar input{min-width:100px;font-size:12px}
+  .filter-bar{gap:4px}
+  .filter-bar select,.filter-bar input{min-width:0;font-size:12px}
+  .filter-bar .search-box{min-width:0}
   select{font-size:13px}
   select option{font-size:13px}
   .card{padding:12px}
@@ -376,12 +389,14 @@ select option{font-size:13px;padding:2px 6px}
   .data-table th,.data-table td{padding:6px 7px}
   .tabs{gap:2px;margin-bottom:10px}
   .tab{padding:6px 10px;font-size:12px}
-  .todo-header-row{flex-wrap:wrap!important}
-  .todo-header-row .tabs{flex:1 1 auto;min-width:0}
-  .todo-header-row .btn-primary{margin-left:auto}
+  .todo-header-row{flex-wrap:nowrap!important;gap:4px}
+  .todo-header-row .tabs{flex:1 1 auto;min-width:0;gap:1px}
+  .todo-header-row .tab{padding:5px 6px;font-size:11px}
+  .todo-header-row .btn-primary{flex-shrink:0;font-size:12px;padding:5px 10px}
   #dailySubSelect{min-width:120px!important;max-width:100%}
   #rvFrom,#rvTo{min-width:100px!important}
-  .todo-filter-bar select{min-width:90px}
+  .todo-filter-bar select{min-width:0;flex:1 1 auto;font-size:12px}
+  .todo-filter-bar{gap:4px}
   .task-nav-dots{flex-wrap:wrap}
   .card{overflow-x:auto;-webkit-overflow-scrolling:touch}
   .proj-detail-section{overflow-x:auto;-webkit-overflow-scrolling:touch}
@@ -410,13 +425,17 @@ select option{font-size:13px;padding:2px 6px}
   .cal-day .cal-stamp{width:18px;height:18px;font-size:7px}
   .chart-bar .label{width:60px;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .chart-bar .bar-count{font-size:10px}
-  .filter-bar select,.filter-bar input{min-width:90px}
+  .filter-bar select,.filter-bar input{min-width:0}
+  .filter-bar{gap:3px}
   #dailySubSelect{min-width:100px!important}
   #rvFrom,#rvTo{min-width:90px!important}
   /* Project management: compact buttons on narrow screens */
   .pmg-actions .proj-mgmt-btns .btn{font-size:10px;padding:3px 6px}
   .plan-date{width:72px!important;font-size:10px}
   .cat-row{flex-wrap:wrap;gap:6px}
+  .todo-header-row .tab{padding:4px 5px;font-size:10px}
+  .todo-header-row .btn-primary{font-size:11px;padding:4px 8px}
+  .todo-header-row{gap:2px}
   /* Settings modal sections: stack on very narrow screens */
   .modal .form-row{flex-direction:column}
   .modal{max-height:90vh}
@@ -1941,7 +1960,7 @@ const App = {
           '<div class="tab" onclick="App.filterTodosByStatus(\'overdue\',this)">超期 ('+overdue.length+')</div>'+
           '<div class="tab" onclick="App.filterTodosByStatus(\'completed\',this)">已完成 ('+completed.length+')</div>'+
         '</div>'+
-        '<button class="btn btn-primary" onclick="App.openTodoModal()" style="flex-shrink:0">+ 添加待办</button>'+
+        '<button class="btn btn-primary" onclick="App.openTodoModal()" style="flex-shrink:0;white-space:nowrap">+ 待办</button>'+
       '</div>'+
 
       '<div class="card"><div id="todoList"></div></div>';
@@ -2265,7 +2284,7 @@ const App = {
         '<button class="btn btn-ghost" onclick="App.openThoughtTypesModal()">⚙ 管理记录类型</button>'+
       '</div>'+
 
-      '<div class="grid grid-2" style="margin-bottom:7px">'+
+      '<div class="grid grid-2 thoughts-stats" style="margin-bottom:7px">'+
         '<div class="stat-card" onclick="App.filterThoughtsByType()"><div class="stat-icon" style="background:var(--c-blue-bg);color:var(--c-blue-tx)">📝</div><div class="stat-info"><div class="num">'+this.data.thoughts.length+'</div><div class="label">全部记录</div></div></div>'+
         '<div class="stat-card" onclick="App.filterThoughtsByStar()"><div class="stat-icon" style="background:var(--c-green-bg);color:var(--c-green-tx)">⭐</div><div class="stat-info"><div class="num">'+starredCount+'</div><div class="label">星标收藏</div></div></div>'+
       '</div>'+
@@ -4074,13 +4093,30 @@ const App = {
 
   /* ---- Category Management ---- */
   addCategory(){
-    const label=prompt('请输入新分类名称：');
-    if(!label||!label.trim())return;
-    const key='cat_'+Date.now().toString(36);
     const colors=['#2E8B7A','#4AA898','#E8B84B','#E07070','#7B8EC8','#6BBFB0'];
     const color=colors[Math.floor(Math.random()*colors.length)];
-    this.data.categories.push({key,label:label.trim(),color});
-    this.saveData();this.toast('分类已添加','success');
+    this.showModal('➕ 新增分类',
+      '<div class="form-group"><label>分类名称 <span class="opt">*</span></label><input type="text" id="newCatName" placeholder="请输入分类名称" autofocus></div>'+
+      '<div class="form-group"><label>分类颜色</label><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px" id="colorPicker">'+
+        colors.map((c,i)=>'<span onclick="App._selectCatColor(\''+c+'\')" data-color="'+c+'" style="width:32px;height:32px;border-radius:8px;background:'+c+';cursor:pointer;border:3px solid '+(i===0?'var(--primary)':'transparent')+';transition:border-color .2s"></span>').join('')+
+      '</div></div>'+
+      '<div class="modal-actions"><button class="btn btn-ghost" onclick="App.closeModal()">取消</button>'+
+      '<button class="btn btn-primary" onclick="App._saveNewCategory()">添加</button></div>');
+    this._pendingCatColor=color;
+  },
+  _selectCatColor(c){
+    this._pendingCatColor=c;
+    document.querySelectorAll('#colorPicker span').forEach(s=>{
+      s.style.borderColor=s.dataset.color===c?'var(--primary)':'transparent';
+    });
+  },
+  _saveNewCategory(){
+    const el=document.getElementById('newCatName');
+    const label=el?el.value.trim():'';
+    if(!label){this.toast('请输入分类名称','error');return}
+    const key='cat_'+Date.now().toString(36);
+    this.data.categories.push({key,label,color:this._pendingCatColor||'#2E8B7A'});
+    this.saveData();this.closeModal();this.toast('分类已添加','success');
     if(document.getElementById('catMgmtList'))this.openCategoryMgmtModal();
     else this.openSettingsModal();
   },
@@ -4088,10 +4124,24 @@ const App = {
   editCategory(idx){
     const cat=this.data.categories[idx];
     if(!cat)return;
-    const label=prompt('编辑分类名称：',cat.label);
-    if(!label||!label.trim())return;
-    cat.label=label.trim();
-    this.saveData();this.toast('分类已更新','success');
+    const colors=['#2E8B7A','#4AA898','#E8B84B','#E07070','#7B8EC8','#6BBFB0'];
+    this.showModal('✏️ 编辑分类',
+      '<div class="form-group"><label>分类名称 <span class="opt">*</span></label><input type="text" id="editCatName" value="'+this.esc(cat.label)+'" autofocus></div>'+
+      '<div class="form-group"><label>分类颜色</label><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px" id="colorPicker">'+
+        colors.map(c=>'<span onclick="App._selectCatColor(\''+c+'\')" data-color="'+c+'" style="width:32px;height:32px;border-radius:8px;background:'+c+';cursor:pointer;border:3px solid '+(c===cat.color?'var(--primary)':'transparent')+';transition:border-color .2s"></span>').join('')+
+      '</div></div>'+
+      '<div class="modal-actions"><button class="btn btn-ghost" onclick="App.closeModal()">取消</button>'+
+      '<button class="btn btn-primary" onclick="App._saveEditCategory('+idx+')">保存</button></div>');
+    this._pendingCatColor=cat.color;
+  },
+  _saveEditCategory(idx){
+    const el=document.getElementById('editCatName');
+    const label=el?el.value.trim():'';
+    if(!label){this.toast('请输入分类名称','error');return}
+    const cat=this.data.categories[idx];
+    cat.label=label;
+    cat.color=this._pendingCatColor||cat.color;
+    this.saveData();this.closeModal();this.toast('分类已更新','success');
     if(document.getElementById('catMgmtList'))this.openCategoryMgmtModal();
     else this.openSettingsModal();
   },
@@ -4099,10 +4149,18 @@ const App = {
   delCategory(idx){
     const cat=this.data.categories[idx];
     if(!cat)return;
-    if(!confirm('确定删除分类"'+cat.label+'"？关联项目将变为未分类。'))return;
+    this.showModal('🗑 删除分类',
+      '<div style="margin-bottom:12px">确定删除分类 <b>"'+this.esc(cat.label)+'"</b>？</div>'+
+      '<div style="font-size:12px;color:var(--text-sec);margin-bottom:8px">关联项目将变为未分类。此操作不可恢复。</div>'+
+      '<div class="modal-actions"><button class="btn btn-ghost" onclick="App.closeModal()">取消</button>'+
+      '<button class="btn btn-danger" onclick="App._confirmDelCategory('+idx+')">确认删除</button></div>');
+  },
+  _confirmDelCategory(idx){
+    const cat=this.data.categories[idx];
+    if(!cat)return;
     this.data.projects.forEach(p=>{if(p.category===cat.key)p.category=''});
     this.data.categories.splice(idx,1);
-    this.saveData();this.toast('已删除','success');
+    this.saveData();this.closeModal();this.toast('已删除','success');
     if(document.getElementById('catMgmtList'))this.openCategoryMgmtModal();
     else this.openSettingsModal();
   },
@@ -4694,6 +4752,20 @@ document.getElementById('cloudSyncModal').addEventListener('click', function(e){
 
 // Start cloud sync after app init (async, non-blocking)
 CloudSync.init();
+
+// Register service worker for PWA
+if('serviceWorker' in navigator){
+  window.addEventListener('load',function(){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  });
+}
+// Make install prompt available
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',function(e){
+  e.preventDefault();
+  deferredPrompt=e;
+});
+window.addEventListener('appinstalled',function(){deferredPrompt=null});
 </script>
 </body>
 </html>
