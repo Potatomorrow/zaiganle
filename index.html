@@ -83,8 +83,8 @@ body.sidebar-hidden .sidebar-toggle{left:12px}
 .btn-sm{padding:4px 11px;font-size:11px}
 .btn-danger{background:var(--danger);color:#fff}
 
-.form-group{margin-bottom:6px}
-.form-group label{display:block;font-size:12px;font-weight:600;margin-bottom:3px;color:var(--text)}
+.form-group{margin-bottom:10px}
+.form-group label{display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:var(--text)}
 .form-group label .opt{color:var(--text-light);font-weight:400;font-size:11px}
 input[type=text],input[type=date],input[type=number],select,textarea{width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit;transition:border-color .2s,box-shadow .2s;background:#fff;color:var(--text)}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(46,139,122,.15)}
@@ -347,6 +347,16 @@ select option{font-size:13px;padding:2px 6px}
 @media(max-width:768px){
   .thoughts-stats{grid-template-columns:repeat(2,1fr)!important}
   .thoughts-stats .stat-card{width:100%}
+  .dashboard-stats{grid-template-columns:repeat(2,1fr)!important}
+  .dashboard-stats .stat-card{width:100%;padding:16px;gap:14px}
+  .dashboard-stats .stat-icon{width:44px;height:44px;font-size:20px}
+  .dashboard-stats .stat-info .num{font-size:26px}
+  .dashboard-stats .stat-info .label{font-size:12px}
+  .todos-stats{grid-template-columns:repeat(2,1fr)!important}
+  .todos-stats .stat-card{width:100%;padding:16px;gap:14px}
+  .todos-stats .stat-icon{width:44px;height:44px;font-size:20px}
+  .todos-stats .stat-info .num{font-size:26px}
+  .todos-stats .stat-info .label{font-size:12px}
   #sidebar{width:200px;transform:translateX(-100%);box-shadow:var(--shadow-lg)}
   body.sidebar-shown #sidebar{transform:translateX(0)}
   body.sidebar-shown #sidebar-backdrop{opacity:1;visibility:visible}
@@ -371,7 +381,7 @@ select option{font-size:13px;padding:2px 6px}
   .page-title{font-size:17px}
   .page-desc{font-size:12px;margin-bottom:4px}
   .quick-actions{gap:6px;margin-bottom:10px;flex-wrap:wrap}
-  .quick-btn{padding:7px 10px;font-size:12px;flex:none;width:auto;min-width:130px}
+  .quick-btn{padding:7px 10px;font-size:12px;flex:1 1 calc(50% - 6px);min-width:0;white-space:nowrap}
   .quick-btn .qi{font-size:14px}
   .filter-bar{gap:4px}
   .filter-bar select,.filter-bar input{min-width:0;font-size:12px}
@@ -417,9 +427,19 @@ select option{font-size:13px;padding:2px 6px}
   .grid-2{grid-template-columns:repeat(2,1fr)}
   .grid-3{grid-template-columns:repeat(3,1fr)}
   .grid-4{grid-template-columns:repeat(4,1fr)}
+  .dashboard-stats{grid-template-columns:repeat(2,1fr)!important}
+  .dashboard-stats .stat-card{width:100%;padding:14px;gap:12px}
+  .dashboard-stats .stat-icon{width:40px;height:40px;font-size:18px}
+  .dashboard-stats .stat-info .num{font-size:24px}
+  .dashboard-stats .stat-info .label{font-size:11px}
+  .todos-stats{grid-template-columns:repeat(2,1fr)!important}
+  .todos-stats .stat-card{width:100%;padding:14px;gap:12px}
+  .todos-stats .stat-icon{width:40px;height:40px;font-size:18px}
+  .todos-stats .stat-info .num{font-size:24px}
+  .todos-stats .stat-info .label{font-size:11px}
   .page-title{font-size:16px}
   .quick-actions{flex-direction:row;flex-wrap:wrap;gap:6px}
-  .quick-btn{width:auto;flex:none;min-width:130px;justify-content:center}
+  .quick-btn{width:auto;flex:1 1 calc(50% - 6px);min-width:0;justify-content:center;white-space:nowrap}
   .stat-card{padding:12px 10px;gap:10px}
   .stat-card .stat-icon{width:34px;height:34px;font-size:15px}
   .stat-card .stat-info .num{font-size:20px}
@@ -1102,7 +1122,7 @@ const App = {
         '<div class="quick-btn" onclick="App.openSettingsModal()"><span class="qi">⚙</span> 项目管理</div>'+
       '</div>'+
 
-      '<div class="grid grid-4" style="margin-bottom:7px">'+
+      '<div class="grid grid-4 dashboard-stats" style="margin-bottom:7px">'+
         '<div class="stat-card" onclick="App.openActiveProjectsModal()">'+
           '<div class="stat-icon" style="background:var(--c-teal-bg);color:var(--c-teal-tx)">📁</div>'+
           '<div class="stat-info"><div class="num">'+activeProjs.length+'</div><div class="label">进行中项目</div></div></div>'+
@@ -1545,7 +1565,7 @@ const App = {
     }
 
     document.getElementById('progressTabContent').innerHTML=
-      '<div class="card" style="margin-bottom:14px">'+
+      '<div class="card" style="margin-bottom:10px">'+
         '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">'+
           '<div style="font-size:12px;color:var(--text-sec);font-weight:600">当前 '+(this.dailyIdx+1)+'/'+items.length+'</div>'+
           '<select id="dailySubSelect" onchange="App.switchDailyTask(parseInt(this.value))" style="width:auto;min-width:260px">'+
@@ -1574,7 +1594,7 @@ const App = {
       '</div>'+
 
       '<div class="card">'+
-        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">'+
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">'+
           '<span class="tag '+this.catCls(proj.category)+'" style="'+this.catTagStyle(proj.category)+'">'+this.catLabel(proj.category)+'</span>'+
           (isProj?
             '<span style="font-size:17px;font-weight:700;color:var(--text)">'+this.esc(proj.name)+'</span>'
@@ -1607,7 +1627,7 @@ const App = {
           '<button class="btn btn-ghost btn-sm" onclick="App.addPlanItem()" style="margin-top:4px">+ 添加计划项</button>'+
         '</div>'+
 
-        '<div style="display:flex;gap:10px">'+
+        '<div style="display:flex;gap:10px;margin-top:12px">'+
           (isProj?
             '<button class="btn btn-ghost" onclick="App.submitDailyNoUpdate(null,\''+cur.id+'\')">无更新 →</button>'+
             '<button class="btn btn-primary" onclick="App.submitDaily(null,\''+cur.id+'\')">保存</button>'+
@@ -1942,7 +1962,7 @@ const App = {
       '<h1 class="page-title">待办中心</h1>'+
       '<p class="page-desc">勾选闭环 · 超期标红 · 星标优先 · 按项目/子任务筛选 · 完成同步至进度</p>'+
 
-      '<div class="grid grid-4" style="margin-bottom:18px">'+
+      '<div class="grid grid-4 todos-stats" style="margin-bottom:18px">'+
         '<div class="stat-card" onclick="App.filterTodosByStatus(\'pending\')"><div class="stat-icon" style="background:var(--c-amber-bg);color:var(--c-amber-tx)">⏳</div><div class="stat-info"><div class="num">'+pending.length+'</div><div class="label">待办中</div></div></div>'+
         '<div class="stat-card" onclick="App.filterTodosByStatus(\'overdue\')"><div class="stat-icon" style="background:var(--c-rose-bg);color:var(--c-rose-tx)">⚠️</div><div class="stat-info"><div class="num">'+overdue.length+'</div><div class="label">已超期</div></div></div>'+
         '<div class="stat-card" onclick="App.filterTodosByStatus(\'completed\')"><div class="stat-icon" style="background:var(--c-green-bg);color:var(--c-green-tx)">✅</div><div class="stat-info"><div class="num">'+completed.length+'</div><div class="label">已完成</div></div></div>'+
