@@ -43,7 +43,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Micr
 .nav-item.active{background:#E6F3F1;color:var(--primary);border-left-color:var(--primary);font-weight:600}
 .nav-item .icon{font-size:16px;width:18px;text-align:center;flex-shrink:0}
 .nav-item .badge{margin-left:auto;background:var(--danger);color:#fff;font-size:10px;padding:1px 7px;border-radius:10px;font-weight:600}
-.sidebar-footer{padding:14px 18px;border-top:1px solid var(--border);font-size:11px;color:var(--text-light);display:flex;align-items:center;justify-content:space-between}
+.sidebar-footer{padding:14px 18px;border-top:1px solid var(--border);font-size:11px;color:var(--text-light);display:flex;align-items:center;justify-content:space-around;gap:12px}
 .sidebar-footer .gear{cursor:pointer;font-size:15px;opacity:.5;transition:opacity .2s}
 .sidebar-footer .gear:hover{opacity:1}
 
@@ -86,10 +86,10 @@ body.sidebar-hidden .sidebar-toggle{left:12px}
 .form-group{margin-bottom:10px}
 .form-group label{display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:var(--text)}
 .form-group label .opt{color:var(--text-light);font-weight:400;font-size:11px}
-input[type=text],input[type=date],input[type=number],select,textarea{width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit;transition:border-color .2s,box-shadow .2s;background:#fff;color:var(--text)}
+input[type=text],input[type=date],input[type=number],select,textarea{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit;transition:border-color .2s,box-shadow .2s;background:#fff;color:var(--text);min-height:40px;line-height:1.5}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(46,139,122,.15)}
-textarea{resize:vertical;min-height:52px}
-select{cursor:pointer;font-size:13px}
+textarea{resize:vertical;min-height:56px}
+select{cursor:pointer;font-size:13px;min-height:40px}
 select option{font-size:13px;padding:2px 6px}
 .form-row{display:flex;gap:10px}.form-row .form-group{flex:1}
 
@@ -132,11 +132,13 @@ select option{font-size:13px;padding:2px 6px}
 .pbar{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
 .pbar-fill{height:100%;border-radius:3px;transition:width .3s}
 
-.filter-bar{display:flex;gap:6px;align-items:center;flex-wrap:nowrap;margin-bottom:12px;width:100%}
-.filter-bar select{width:auto;min-width:0;flex:1 1 0;max-width:30%}
-.filter-bar .search-box{flex:2 1 0;min-width:0;width:100%}
+.filter-bar{display:flex;gap:5px;align-items:center;flex-wrap:nowrap;margin-bottom:12px;width:100%;overflow:hidden}
+.filter-bar select{width:auto;min-width:65px;flex:1 1 0;max-width:none;text-overflow:ellipsis;white-space:nowrap;overflow:hidden}
+.filter-bar .search-box{flex:2 1 0;min-width:100px;width:100%}
 .filter-bar .search-box input{width:100%}
 .filter-bar::-webkit-scrollbar{display:none}
+.filter-bar input[type=date]{min-width:90px;flex:1 1 auto}
+.filter-bar span{flex-shrink:0}
 
 .empty{text-align:center;padding:44px 20px;color:var(--text-light)}
 .empty .icon{font-size:44px;margin-bottom:10px;opacity:.5}
@@ -173,7 +175,7 @@ select option{font-size:13px;padding:2px 6px}
 /* timeline variant used in subtask detail */
 .tl-card{border-left:3px solid var(--primary-light);border-radius:0 9px 9px 0;padding:10px 14px;margin-bottom:8px;background:var(--card);box-shadow:var(--shadow);transition:box-shadow .2s;position:relative}
 .tl-card:hover{box-shadow:var(--shadow-lg)}
-.tl-card .tl-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.tl-card .tl-meta{margin-bottom:6px}
 .tl-card .tl-date{font-size:11px;color:var(--text-light);font-weight:500}
 .tl-card .tl-body p{font-size:13px;margin-bottom:4px;line-height:1.6}
 .tl-card .tl-body .fl{font-weight:600;font-size:12px;margin-right:4px}
@@ -383,9 +385,10 @@ select option{font-size:13px;padding:2px 6px}
   .quick-actions{gap:6px;margin-bottom:10px;flex-wrap:wrap}
   .quick-btn{padding:7px 10px;font-size:12px;flex:1 1 calc(50% - 6px);min-width:0;white-space:nowrap}
   .quick-btn .qi{font-size:14px}
-  .filter-bar{gap:4px}
-  .filter-bar select,.filter-bar input{min-width:0;font-size:12px}
-  .filter-bar .search-box{min-width:0}
+  .filter-bar{gap:4px;flex-wrap:nowrap}
+  .filter-bar select{min-width:60px;font-size:12px}
+  .filter-bar input{min-width:80px;font-size:12px}
+  .filter-bar .search-box{min-width:90px}
   select{font-size:13px}
   select option{font-size:13px}
   .card{padding:12px}
@@ -448,8 +451,9 @@ select option{font-size:13px;padding:2px 6px}
   .cal-day .cal-stamp{width:18px;height:18px;font-size:7px}
   .chart-bar .label{width:60px;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .chart-bar .bar-count{font-size:10px}
-  .filter-bar select,.filter-bar input{min-width:0}
-  .filter-bar{gap:3px}
+  .filter-bar select{min-width:55px;font-size:11px}
+  .filter-bar input{min-width:70px;font-size:11px}
+  .filter-bar{gap:3px;flex-wrap:nowrap}
   #dailySubSelect{min-width:100px!important}
   #rvFrom,#rvTo{min-width:90px!important}
   /* Project management: compact buttons on narrow screens */
@@ -501,13 +505,10 @@ select option{font-size:13px;padding:2px 6px}
     <div class="sidebar-logo"><span class="dot"></span> <span>在干了</span></div>
     <nav class="sidebar-nav" id="navMenu"></nav>
     <div class="sidebar-footer">
-      <span>v5.0</span>
-      <span class="gear" onclick="App.exportAllData()" title="导出数据">📤</span>
       <span class="gear" onclick="App.importData()" title="导入数据">📥</span>
+      <span class="gear" onclick="App.exportAllData()" title="导出数据">📤</span>
       <span class="gear" onclick="App.resetData()" title="重置数据">🔄</span>
-      <span class="gear" onclick="App.openSettingsModal()" title="设置">⚙</span>
       <span class="gear" id="cloudSyncBtn" onclick="CloudSync.openSettings()" title="云同步">☁</span>
-      <span class="gear" id="installBtn" onclick="PWAInstall.prompt()" title="安装到桌面">📲</span>
     </div>
   </aside>
   <div id="sidebar-backdrop"></div>
@@ -1092,7 +1093,6 @@ const App = {
     const pendingTodos=this.data.todos.filter(t=>t.status==='pending');
     const overdueTodos=pendingTodos.filter(t=>t.dueDate&&t.dueDate<today);
     const todayReports=this.data.progress.filter(p=>p.date===today);
-    const openIssues=this.data.thoughts.filter(t=>t.type==='踩坑记录'&&t.status!=='resolved');
     const staleSubs=this.activeSubs().filter(s=>{
       const prog=this.progBySub(s.id);
       if(prog.length===0)return true;
@@ -1133,9 +1133,9 @@ const App = {
         '<div class="stat-card" onclick="App.openTodayReportsModal()">'+
           '<div class="stat-icon" style="background:var(--c-green-bg);color:var(--c-green-tx)">✏️</div>'+
           '<div class="stat-info"><div class="num">'+todayReports.length+'</div><div class="label">今日已填报</div></div></div>'+
-        '<div class="stat-card" onclick="App.openOpenIssuesModal()">'+
-          '<div class="stat-icon" style="background:var(--c-rose-bg);color:var(--c-rose-tx)">🔧</div>'+
-          '<div class="stat-info"><div class="num">'+openIssues.length+'</div><div class="label">未解决问题</div></div></div>'+
+        '<div class="stat-card" onclick="App.openStaleSubsModal()">'+
+          '<div class="stat-icon" style="background:var(--c-amber-bg);color:var(--c-amber-tx)">⚠️</div>'+
+          '<div class="stat-info"><div class="num">'+staleSubs.length+'</div><div class="label">停滞子任务</div></div></div>'+
       '</div>'+
 
       '<div class="grid grid-2" style="margin-bottom:7px">'+
@@ -1429,19 +1429,90 @@ const App = {
   openPendingTodosModal(){
     const pending=this.data.todos.filter(t=>t.status==='pending').sort((a,b)=>{if(a.starred&&!b.starred)return -1;if(!a.starred&&b.starred)return 1;return 0});
     const today=this.today();
+    if(!pending.length){
+      this.showModal('✅ 待办任务 (0)',
+        '<div class="empty"><div class="text">暂无待办任务</div></div>'+
+        '<div class="modal-actions"><button class="btn btn-ghost" onclick="App.closeModal()">关闭</button><button class="btn btn-primary" onclick="App.closeModal();App.openTodoModal()">+ 添加</button></div>'
+      );
+      return;
+    }
+    if(!this._collapsedTodoGroups)this._collapsedTodoGroups={};
+    const projMap={};
+    const unassigned=[];
+    pending.forEach(t=>{
+      if(t.projectId){
+        if(!projMap[t.projectId])projMap[t.projectId]=[];
+        projMap[t.projectId].push(t);
+      }else{
+        unassigned.push(t);
+      }
+    });
+    const projEntries=Object.entries(projMap).map(([pid,todos])=>({
+      proj:this.projById(pid),
+      todos:todos
+    })).sort((a,b)=>{
+      if(a.proj&&b.proj)return a.proj.name.localeCompare(b.proj.name,'zh');
+      if(a.proj)return -1;
+      if(b.proj)return 1;
+      return 0;
+    });
+    const cats=this.getCategories();
+    let html='';
+    projEntries.forEach((entry,i)=>{
+      const p=entry.proj;
+      const todos=entry.todos;
+      const collapsed=this._collapsedTodoGroups['proj_'+(p?p.id:'none')];
+      const catColor=p?(cats.find(c=>c.key===p.category)?.color||'var(--primary)'):'var(--text-light)';
+      html+='<div class="dim-card" style="margin-bottom:8px">'+
+        '<div class="dim-card-header" onclick="App.toggleTodoGroup(\'proj_'+(p?p.id:'none')+'\')">'+
+          '<span class="cat-dot" style="background:'+catColor+';width:14px;height:14px;border-radius:4px;display:inline-block"></span>'+
+          '<span>'+(p?p.name:'未绑定项目')+'</span>'+
+          '<span style="font-size:12px;color:var(--text-light);font-weight:400">'+todos.length+'项待办</span>'+
+          '<span class="dim-arrow'+(collapsed?' collapsed':'')+'">▾</span>'+
+        '</div>'+
+        '<div class="dim-card-body'+(collapsed?' collapsed':'')+'">'+
+        todos.map(t=>{
+          const sub=t.subtaskId?this.subById(t.subtaskId):null;
+          const overdue=t.dueDate&&t.dueDate<today;
+          return '<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg);border-radius:8px;margin-bottom:6px;cursor:pointer" onclick="App.closeModal();App.navigate(\'todos\')">'+
+            '<span style="font-size:16px">'+(t.starred?'⭐':'•')+'</span>'+
+            '<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">'+this.esc(t.title)+'</div>'+
+            '<div style="font-size:11px;color:var(--text-light)">'+(sub?sub.name:'')+(overdue?' · <span style="color:var(--danger)">超期'+this.daysAgo(t.dueDate)+'天</span>':'')+'</div></div>'+
+            '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();App.toggleTodoFromDash(\''+t.id+'\')">完成</button></div>';
+        }).join('')+
+        '</div></div>';
+    });
+    if(unassigned.length){
+      const collapsed=this._collapsedTodoGroups['proj_unassigned'];
+      html+='<div class="dim-card" style="margin-bottom:8px">'+
+        '<div class="dim-card-header" onclick="App.toggleTodoGroup(\'proj_unassigned\')">'+
+          '<span class="cat-dot" style="background:var(--text-light);width:14px;height:14px;border-radius:4px;display:inline-block"></span>'+
+          '<span>未绑定项目</span>'+
+          '<span style="font-size:12px;color:var(--text-light);font-weight:400">'+unassigned.length+'项待办</span>'+
+          '<span class="dim-arrow'+(collapsed?' collapsed':'')+'">▾</span>'+
+        '</div>'+
+        '<div class="dim-card-body'+(collapsed?' collapsed':'')+'">'+
+        unassigned.map(t=>{
+          const overdue=t.dueDate&&t.dueDate<today;
+          return '<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg);border-radius:8px;margin-bottom:6px;cursor:pointer" onclick="App.closeModal();App.navigate(\'todos\')">'+
+            '<span style="font-size:16px">'+(t.starred?'⭐':'•')+'</span>'+
+            '<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">'+this.esc(t.title)+'</div>'+
+            '<div style="font-size:11px;color:var(--text-light)">未绑定'+(overdue?' · <span style="color:var(--danger)">超期'+this.daysAgo(t.dueDate)+'天</span>':'')+'</div></div>'+
+            '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();App.toggleTodoFromDash(\''+t.id+'\')">完成</button></div>';
+        }).join('')+
+        '</div></div>';
+    }
     this.showModal('✅ 待办任务 ('+pending.length+')',
-      (pending.length?pending.map(t=>{
-        const proj=t.projectId?this.projById(t.projectId):null;
-        const sub=t.subtaskId?this.subById(t.subtaskId):null;
-        const overdue=t.dueDate&&t.dueDate<today;
-        return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border-radius:8px;margin-bottom:8px;cursor:pointer" onclick="App.closeModal();App.navigate(\'todos\')">'+
-          '<span style="font-size:16px">'+(t.starred?'⭐':'•')+'</span>'+
-          '<div style="flex:1"><div style="font-weight:600;font-size:13px">'+this.esc(t.title)+'</div>'+
-          '<div style="font-size:11px;color:var(--text-light)">'+(proj?proj.name+(sub?' / '+sub.name:''):'未绑定')+(overdue?' · <span style="color:var(--danger)">超期'+this.daysAgo(t.dueDate)+'天</span>':'')+'</div></div>'+
-          '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();App.toggleTodoFromDash(\''+t.id+'\')">完成</button></div>';
-      }).join(''):'<div class="empty"><div class="text">暂无待办任务</div></div>')+
+      '<div style="margin-bottom:12px;font-size:13px;color:var(--text-sec)">按项目分组显示，点击卡片前往待办中心</div>'+
+      html+
       '<div class="modal-actions"><button class="btn btn-ghost" onclick="App.closeModal()">关闭</button><button class="btn btn-primary" onclick="App.closeModal();App.openTodoModal()">+ 添加</button></div>'
     );
+  },
+
+  toggleTodoGroup(key){
+    if(!this._collapsedTodoGroups)this._collapsedTodoGroups={};
+    this._collapsedTodoGroups[key]=!this._collapsedTodoGroups[key];
+    this.openPendingTodosModal();
   },
 
   openTodayReportsModal(){
@@ -1456,6 +1527,46 @@ const App = {
           '<div style="font-size:12px;color:var(--text-sec);margin-top:4px">'+this.esc(r.progress||'无更新')+'</div>'+
           '</div>';
       }).join(''):'<div class="empty"><div class="text">今日暂无填报</div></div>')+
+      '<div class="modal-actions"><button class="btn btn-ghost" onclick="App.closeModal()">关闭</button><button class="btn btn-primary" onclick="App.closeModal();App.navigate(\'progress\')">去填报</button></div>'
+    );
+  },
+
+  openStaleSubsModal(){
+    const stale=this.activeSubs().filter(s=>{
+      const prog=this.progBySub(s.id);
+      if(prog.length===0)return true;
+      return this.daysAgo(prog[0].date)>3;
+    }).sort((a,b)=>{
+      const pa=this.progBySub(a.id)[0];const pb=this.progBySub(b.id)[0];
+      const da=pa?this.daysAgo(pa.date):999;const db=pb?this.daysAgo(pb.date):999;
+      return db-da;
+    });
+    if(!stale.length){
+      this.showModal('⚠️ 停滞子任务 (0)',
+        '<div class="empty"><div class="text">🎉 所有进行中子任务都在正常更新</div></div>'+
+        '<div class="modal-actions"><button class="btn btn-ghost" onclick="App.closeModal()">关闭</button></div>'
+      );
+      return;
+    }
+    this.showModal('⚠️ 停滞子任务 ('+stale.length+')',
+      '<div style="margin-bottom:10px;font-size:12px;color:var(--text-sec)">以下进行中的子任务超过 3 天未填报进度</div>'+
+      stale.map(s=>{
+        const proj=this.projById(s.projectId);
+        const prog=this.progBySub(s.id)[0];
+        const days=prog?this.daysAgo(prog.date):null;
+        const lastDate=prog?this.fmtDateFull(prog.date):'从未填报';
+        const lastProgress=prog?this.esc((prog.progress||'无更新').slice(0,60)):'';
+        return '<div style="padding:10px 12px;background:var(--bg);border-radius:8px;margin-bottom:8px;cursor:pointer" onclick="App.closeModal();App.navigate(\'progress\');setTimeout(function(){App.dailyIdx=App.dailyItems().findIndex(function(i){return i._type===\'subtask\'&&i.id===\''+s.id+'\'});App.renderDailyFormPage()},50)">'+
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'+
+            '<span class="tag '+this.catCls(proj?.category||'')+'" style="'+this.catTagStyle(proj?.category||'')+'">'+this.catLabel(proj?.category||'')+'</span>'+
+            '<span style="font-weight:600;font-size:13px">'+this.esc(s.name)+'</span>'+
+            '<span style="font-size:11px;color:var(--text-light)">'+(proj?proj.name:'')+'</span>'+
+            '<span style="margin-left:auto;font-size:11px;color:var(--danger);font-weight:600">'+(days===null?'从未填报':days+'天未更新')+'</span>'+
+          '</div>'+
+          '<div style="font-size:11px;color:var(--text-light);margin-bottom:4px">上次填报：'+lastDate+'</div>'+
+          (lastProgress?'<div style="font-size:12px;color:var(--text-sec)">'+lastProgress+'</div>':'')+
+        '</div>';
+      }).join('')+
       '<div class="modal-actions"><button class="btn btn-ghost" onclick="App.closeModal()">关闭</button><button class="btn btn-primary" onclick="App.closeModal();App.navigate(\'progress\')">去填报</button></div>'
     );
   },
@@ -1615,10 +1726,10 @@ const App = {
         '<div class="form-group"><label>今日进度 <span class="opt">*</span></label>'+
           '<textarea id="dpProgress" placeholder="描述今日完成的工作...">'+(existing?this.esc(existing.progress):'')+'</textarea></div>'+
 
-        '<div class="form-group"><label>实践手记 <span class="opt">（选填，自动保存到思考笔记）</span></label>'+
+        '<div class="form-group" style="margin-bottom:4px"><label>实践手记 <span class="opt">（选填，自动保存到思考笔记）</span></label>'+
           '<textarea id="dpInsp" placeholder="记录今日的思考、问题或启发..." style="min-height:60px">'+this.esc(existingInspContent)+'</textarea></div>'+
 
-        '<div class="form-group" style="max-width:260px"><label>记录类型 <span class="opt">（自动归类）</span></label>'+
+        '<div class="form-group" style="max-width:200px"><label>记录类型 <span class="opt">（自动归类）</span></label>'+
           '<select id="dpInspType">'+
             this.getThoughtTypes().map(t=>'<option value="'+t.key+'">'+t.icon+' '+t.label+'</option>').join('')+
           '</select></div>'+
@@ -1918,11 +2029,12 @@ const App = {
       const title=sub?sub.name:(proj?'📁 '+proj.name:'');
       return '<div class="tl-card">'+
         '<div class="tl-meta">'+
-          '<div class="tl-body" style="flex:1">'+
+          '<div class="tl-body">'+
           '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">'+
             '<span class="tag '+this.catCls(proj.category)+'" style="'+this.catTagStyle(proj.category)+'">'+this.catLabel(proj.category)+'</span>'+
             '<span style="font-weight:600;font-size:13px">'+this.esc(title)+'</span>'+
             '<span style="font-size:11px;color:var(--text-light)">'+proj.name+'</span>'+
+            '<span class="tl-date" style="margin-left:auto">'+this.fmtDateFull(r.date)+'</span>'+
           '</div>'+
           (r.progress&&r.progress!=='无更新'?'<p><span class="fl" style="color:var(--text)">进度：</span>'+this.esc(r.progress)+'</p>':'')+
           (r.progress==='无更新'?'<p style="color:var(--text-light);font-style:italic">无更新</p>':'')+
@@ -1930,7 +2042,6 @@ const App = {
           (r.nextSteps?'<p><span class="fl" style="color:var(--info)">下一步：</span>'+this.esc(r.nextSteps)+'</p>':'')+
           (r.inspiration?'<p><span class="fl" style="color:var(--warning)">实践手记：</span>'+this.esc(r.inspiration)+'</p>':'')+
           '</div>'+
-          '<span class="tl-date" style="margin-left:12px;flex-shrink:0">'+this.fmtDateFull(r.date)+'</span>'+
         '</div>'+
       '</div>';
     }).join(''):'<div class="empty"><div class="icon">📭</div><div class="text">暂无进度记录</div></div>';
@@ -2054,79 +2165,144 @@ const App = {
     if(fstar&&fstar.value){todos=todos.filter(t=>t.starred)}
 
     todos=[...todos].sort((a,b)=>{
-      // completed always last
       const aPending=a.status==='pending';
       const bPending=b.status==='pending';
       if(aPending&&!bPending)return -1;
       if(!aPending&&bPending)return 1;
       if(aPending&&bPending){
-        // among pending: starred first, then by createdAt desc
         if(a.starred&&!b.starred)return -1;
         if(!a.starred&&b.starred)return 1;
         return (b.createdAt||'').localeCompare(a.createdAt||'');
       }
-      // both completed: by completedDate desc
       return (b.completedDate||'').localeCompare(a.completedDate||'');
     });
 
-    document.getElementById('todoList').innerHTML=todos.length?
-      todos.map(t=>{
-        const proj=t.projectId?this.projById(t.projectId):null;
-        const sub=t.subtaskId?this.subById(t.subtaskId):null;
-        const isOverdue=t.status==='pending'&&t.dueDate&&t.dueDate<today;
-        const isDone=t.status==='completed';
-        const cardCls='todo-card'+(isDone?' completed':'')+(t.starred&&!isDone?' starred':'')+(isOverdue?' overdue':'');
-        /* thought source preview */
-        let thoughtBodyHtml='';
-        let thoughtHeaderHtml='';
-        if(t.thoughtId){
-          const th=this.data.thoughts.find(x=>x.id===t.thoughtId);
-          if(th){
-            const icon=this.thoughtIcon(th.type);
-            const isIssue=this.isIssueType(th.type);
-            const isInsp=this.isInspType(th.type);
-            const isGeneric=!isIssue&&!isInsp;
-            /* header row: icon + type tag + status tag + title (all inline, like tc-header) */
-            thoughtHeaderHtml=
-              '<span style="font-size:14px">'+icon+'</span>'+
-              '<span class="tag tag-other" style="font-size:10px">'+this.esc(th.type)+'</span>'+
-              (isIssue?'<span class="tag '+this.issueStatusCls(th.status)+'" style="font-size:10px">'+this.issueStatusLabel(th.status)+'</span>':'')+
-              (isGeneric&&th.status?'<span class="tag '+this.genericStatusCls(th.status)+'" style="font-size:10px">'+this.genericStatusLabel(th.status)+'</span>':'')+
-              (th.title&&th.title!==t.title?'<span style="font-size:13px;font-weight:600;color:var(--text)">'+this.esc(th.title)+'</span>':'');
-            thoughtBodyHtml=
-              '<div class="tc-content" contenteditable="true" '+
-                'onblur="App.inlineSaveThought(\''+th.id+'\',\'content\',this.innerText)" '+
-                'title="点击可编辑手记内容" '+
-                'style="font-size:12px;margin-top:4px;margin-bottom:0">'+this.esc(th.content)+'</div>'+
-              (isIssue&&th.resolution?'<div style="font-size:11px;color:var(--success);padding:5px 8px;background:#E6F5F0;border-radius:5px;margin-top:4px">✅ 解决方案：'+this.esc(th.resolution)+'</div>':'');
-          }
-        }
-        /* title row: if thought, merge todo title + thought header into one flex row */
-        const titleRow=thoughtHeaderHtml
-          ? '<div class="tc-header" style="margin-bottom:4px">'+thoughtHeaderHtml+
-              '<span class="td-title" contenteditable="'+(isDone?'false':'true')+'" onblur="App.inlineSaveTodo(\''+t.id+'\',\'title\',this.innerText)" title="点击可编辑标题" style="font-weight:500;font-size:13px;margin-left:2px">'+this.esc(t.title)+'</span>'+
-            '</div>'
-          : '<div class="td-title" contenteditable="'+(isDone?'false':'true')+'" onblur="App.inlineSaveTodo(\''+t.id+'\',\'title\',this.innerText)" title="点击可编辑标题">'+this.esc(t.title)+'</div>';
-        return '<div class="'+cardCls+'" id="tc_'+t.id+'">'+
-          '<input type="checkbox" class="td-check" '+(isDone?'checked':'')+' onchange="App.toggleTodo(\''+t.id+'\')">'+
-          '<div class="td-body">'+
-            titleRow+
-            thoughtBodyHtml+
-            '<div class="td-meta">'+
-              '<button class="star-inline '+(t.starred?'active':'')+'" onclick="App.toggleTodoStar(\''+t.id+'\')" style="font-size:13px;padding:0 2px">'+(t.starred?'⭐':'☆')+'</button>'+
-              '<span class="td-due">📅 <input type="date" value="'+(t.dueDate||'')+'" onchange="App.inlineSaveTodo(\''+t.id+'\',\'dueDate\',this.value)" title="点击修改截止日期"'+(isDone?' disabled':'')+'>'+
-              (isOverdue?'<span style="color:var(--danger);font-size:10px">超期'+this.daysAgo(t.dueDate)+'天</span>':'')+
-              '</span>'+
-              (proj?'<span class="td-bind">'+this.esc(proj.name)+(sub?' / '+this.esc(sub.name):'')+'</span>':'<span class="td-bind" style="color:var(--text-light)">未绑定</span>')+
-              (isDone?'<span class="tag tag-done" style="font-size:10px">已完成</span>':'<span class="tag tag-progress" style="font-size:10px">待办中</span>')+
-            '</div>'+
-          '</div>'+
-          '<div class="td-actions">'+
-            '<button class="btn btn-ghost btn-sm" onclick="App.delTodo(\''+t.id+'\')" style="color:var(--danger);font-size:11px">删除</button>'+
-          '</div>'+
-        '</div>';
-      }).join('')
-      :'<div class="empty"><div class="icon">🎉</div><div class="text">暂无待办，去添加一个吧！</div></div>';
+    if(!todos.length){
+      document.getElementById('todoList').innerHTML='<div class="empty"><div class="icon">🎉</div><div class="text">暂无待办，去添加一个吧！</div></div>';
+      return;
+    }
+
+    if(!this._collapsedTodoPageGroups)this._collapsedTodoPageGroups={};
+    const cats=this.getCategories();
+
+    const projMap={};
+    const unassigned=[];
+    todos.forEach(t=>{
+      if(t.projectId){
+        if(!projMap[t.projectId])projMap[t.projectId]=[];
+        projMap[t.projectId].push(t);
+      }else{
+        unassigned.push(t);
+      }
+    });
+
+    const projEntries=Object.entries(projMap).map(([pid,items])=>({
+      proj:this.projById(pid),
+      items:items
+    })).sort((a,b)=>{
+      if(a.proj&&b.proj)return a.proj.name.localeCompare(b.proj.name,'zh');
+      if(a.proj)return -1;
+      if(b.proj)return 1;
+      return 0;
+    });
+
+    let html='';
+    projEntries.forEach((entry,i)=>{
+      const p=entry.proj;
+      const items=entry.items;
+      const gid='page_proj_'+(p?p.id:'none');
+      const collapsed=this._collapsedTodoPageGroups[gid];
+      const catColor=p?(cats.find(c=>c.key===p.category)?.color||'var(--primary)'):'var(--text-light)';
+      const pendingCount=items.filter(t=>t.status==='pending').length;
+      html+='<div class="dim-card" style="margin-bottom:7px">'+
+        '<div class="dim-card-header" onclick="App.toggleTodoPageGroup(\''+gid+'\')">'+
+          '<span class="cat-dot" style="background:'+catColor+';width:14px;height:14px;border-radius:4px;display:inline-block"></span>'+
+          '<span style="font-size:14px">'+this.esc(p?p.name:'未绑定项目')+'</span>'+
+          '<span style="font-size:12px;color:var(--text-light);font-weight:400">共 '+items.length+' 项'+(pendingCount?'，'+pendingCount+' 项待办':'')+'</span>'+
+          '<span class="dim-arrow'+(collapsed?' collapsed':'')+'">▾</span>'+
+        '</div>'+
+        '<div class="dim-card-body'+(collapsed?' collapsed':'')+'" style="padding:10px 14px 14px">'+
+        items.map(t=>this.renderTodoCard(t,today)).join('')+
+        '</div></div>';
+    });
+
+    if(unassigned.length){
+      const gid='page_proj_unassigned';
+      const collapsed=this._collapsedTodoPageGroups[gid];
+      const pendingCount=unassigned.filter(t=>t.status==='pending').length;
+      html+='<div class="dim-card" style="margin-bottom:7px">'+
+        '<div class="dim-card-header" onclick="App.toggleTodoPageGroup(\''+gid+'\')">'+
+          '<span class="cat-dot" style="background:var(--text-light);width:14px;height:14px;border-radius:4px;display:inline-block"></span>'+
+          '<span style="font-size:14px">未绑定项目</span>'+
+          '<span style="font-size:12px;color:var(--text-light);font-weight:400">共 '+unassigned.length+' 项'+(pendingCount?'，'+pendingCount+' 项待办':'')+'</span>'+
+          '<span class="dim-arrow'+(collapsed?' collapsed':'')+'">▾</span>'+
+        '</div>'+
+        '<div class="dim-card-body'+(collapsed?' collapsed':'')+'" style="padding:10px 14px 14px">'+
+        unassigned.map(t=>this.renderTodoCard(t,today)).join('')+
+        '</div></div>';
+    }
+
+    document.getElementById('todoList').innerHTML=html;
+  },
+
+  renderTodoCard(t,today){
+    const proj=t.projectId?this.projById(t.projectId):null;
+    const sub=t.subtaskId?this.subById(t.subtaskId):null;
+    const isOverdue=t.status==='pending'&&t.dueDate&&t.dueDate<today;
+    const isDone=t.status==='completed';
+    const cardCls='todo-card'+(isDone?' completed':'')+(t.starred&&!isDone?' starred':'')+(isOverdue?' overdue':'');
+    let thoughtBodyHtml='';
+    let thoughtHeaderHtml='';
+    if(t.thoughtId){
+      const th=this.data.thoughts.find(x=>x.id===t.thoughtId);
+      if(th){
+        const icon=this.thoughtIcon(th.type);
+        const isIssue=this.isIssueType(th.type);
+        const isInsp=this.isInspType(th.type);
+        const isGeneric=!isIssue&&!isInsp;
+        thoughtHeaderHtml=
+          '<span style="font-size:14px">'+icon+'</span>'+
+          '<span class="tag tag-other" style="font-size:10px">'+this.esc(th.type)+'</span>'+
+          (isIssue?'<span class="tag '+this.issueStatusCls(th.status)+'" style="font-size:10px">'+this.issueStatusLabel(th.status)+'</span>':'')+
+          (isGeneric&&th.status?'<span class="tag '+this.genericStatusCls(th.status)+'" style="font-size:10px">'+this.genericStatusLabel(th.status)+'</span>':'')+
+          (th.title&&th.title!==t.title?'<span style="font-size:13px;font-weight:600;color:var(--text)">'+this.esc(th.title)+'</span>':'');
+        thoughtBodyHtml=
+          '<div class="tc-content" contenteditable="true" '+
+            'onblur="App.inlineSaveThought(\''+th.id+'\',\'content\',this.innerText)" '+
+            'title="点击可编辑手记内容" '+
+            'style="font-size:12px;margin-top:4px;margin-bottom:0">'+this.esc(th.content)+'</div>'+
+          (isIssue&&th.resolution?'<div style="font-size:11px;color:var(--success);padding:5px 8px;background:#E6F5F0;border-radius:5px;margin-top:4px">✅ 解决方案：'+this.esc(th.resolution)+'</div>':'');
+      }
+    }
+    const titleRow=thoughtHeaderHtml
+      ? '<div class="tc-header" style="margin-bottom:4px">'+thoughtHeaderHtml+
+          '<span class="td-title" contenteditable="'+(isDone?'false':'true')+'" onblur="App.inlineSaveTodo(\''+t.id+'\',\'title\',this.innerText)" title="点击可编辑标题" style="font-weight:500;font-size:13px;margin-left:2px">'+this.esc(t.title)+'</span>'+
+        '</div>'
+      : '<div class="td-title" contenteditable="'+(isDone?'false':'true')+'" onblur="App.inlineSaveTodo(\''+t.id+'\',\'title\',this.innerText)" title="点击可编辑标题">'+this.esc(t.title)+'</div>';
+    return '<div class="'+cardCls+'" id="tc_'+t.id+'">'+
+      '<input type="checkbox" class="td-check" '+(isDone?'checked':'')+' onchange="App.toggleTodo(\''+t.id+'\')">'+
+      '<div class="td-body">'+
+        titleRow+
+        thoughtBodyHtml+
+        '<div class="td-meta">'+
+          '<button class="star-inline '+(t.starred?'active':'')+'" onclick="App.toggleTodoStar(\''+t.id+'\')" style="font-size:13px;padding:0 2px">'+(t.starred?'⭐':'☆')+'</button>'+
+          '<span class="td-due">📅 <input type="date" value="'+(t.dueDate||'')+'" onchange="App.inlineSaveTodo(\''+t.id+'\',\'dueDate\',this.value)" title="点击修改截止日期"'+(isDone?' disabled':'')+'>'+
+          (isOverdue?'<span style="color:var(--danger);font-size:10px">超期'+this.daysAgo(t.dueDate)+'天</span>':'')+
+          '</span>'+
+          (sub?'<span class="td-bind">'+this.esc(sub.name)+'</span>':'')+
+          (isDone?'<span class="tag tag-done" style="font-size:10px">已完成</span>':'<span class="tag tag-progress" style="font-size:10px">待办中</span>')+
+        '</div>'+
+      '</div>'+
+      '<div class="td-actions">'+
+        '<button class="btn btn-ghost btn-sm" onclick="App.delTodo(\''+t.id+'\')" style="color:var(--danger);font-size:11px">删除</button>'+
+      '</div>'+
+    '</div>';
+  },
+
+  toggleTodoPageGroup(key){
+    if(!this._collapsedTodoPageGroups)this._collapsedTodoPageGroups={};
+    this._collapsedTodoPageGroups[key]=!this._collapsedTodoPageGroups[key];
+    this.renderTodoList();
   },
 
   toggleTodoStar(id){
@@ -4482,6 +4658,8 @@ window.addEventListener('resize',function(){
 /* ========== Cloud Sync (Supabase) ========== */
 const CloudSync = {
   CONFIG_KEY: 'cloudsync_supabase_v1',
+  LAST_ACCESS_KEY: 'cloudsync_last_access_v1',
+  INACTIVE_LIMIT: 7 * 24 * 60 * 60 * 1000, // 7天未访问则自动清除登录
   config: null,
   client: null,
   pushTimer: null,
@@ -4500,6 +4678,20 @@ const CloudSync = {
     this.config = cfg;
     localStorage.setItem(this.CONFIG_KEY, JSON.stringify(cfg));
     this.updateIndicator();
+  },
+
+  // 安全策略：检查是否超过 7 天未访问
+  checkInactive(){
+    try{
+      const raw = localStorage.getItem(this.LAST_ACCESS_KEY);
+      if(!raw) return false;            // 首次访问，未记录
+      const last = parseInt(raw, 10);
+      if(isNaN(last)) return false;
+      return (Date.now() - last) > this.INACTIVE_LIMIT;
+    }catch(e){ return false; }
+  },
+  touchAccess(){
+    try{ localStorage.setItem(this.LAST_ACCESS_KEY, String(Date.now())); }catch(e){}
   },
 
   initClient(){
@@ -4582,6 +4774,19 @@ const CloudSync = {
 
   async init(){
     this.loadConfig();
+    // 安全策略：超过 7 天未访问，清除登录信息，不恢复会话也不拉取云端数据
+    if(this.config && this.checkInactive()){
+      try{ if(this.initClient()) await this.client.auth.signOut(); }catch(e){}
+      localStorage.removeItem(this.CONFIG_KEY);
+      localStorage.removeItem('cloudsync_config_v1');
+      localStorage.removeItem(this.LAST_ACCESS_KEY);
+      this.config = null;
+      this.client = null;
+      this.updateIndicator('none');
+      this.toast('超过 7 天未访问，为安全已自动退出登录，请重新配置云同步');
+      return;
+    }
+    this.touchAccess();
     if(this.initClient()){
       const session = await this._getSession();
       if(session){
@@ -4695,6 +4900,7 @@ const CloudSync = {
     }
     // 登录成功，持久化配置（不含密码）
     this.saveConfig({ url, anonKey, email });
+    this.touchAccess();
     this.updateIndicator('ok');
     const remote = await this.pull();
     if(remote && !remote.empty){
@@ -4762,6 +4968,7 @@ const CloudSync = {
     }catch(e){}
     localStorage.removeItem(this.CONFIG_KEY);
     localStorage.removeItem('cloudsync_config_v1'); // 顺便清理旧的 Gist 配置
+    localStorage.removeItem(this.LAST_ACCESS_KEY);   // 清除访问时间记录
     this.config = null;
     this.client = null;
     this.updateIndicator('none');
