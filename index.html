@@ -4173,9 +4173,8 @@ const App = {
       '</div>'+
 
       '<div style="margin-bottom:20px">'+
-        '<div style="font-size:14px;font-weight:700;margin-bottom:10px">📁 项目管理</div>'+
-        '<div id="settingsProjList" style="margin-bottom:8px"></div>'+
-        '<button class="btn btn-primary btn-sm" onclick="App.openProjectModal()">+ 新建项目</button>'+
+        '<div style="font-size:14px;font-weight:700;margin-bottom:10px">📁 项目管理 <span style="font-weight:400;font-size:11px;color:var(--text-light)">（点击维度右侧按钮可新建该维度的项目）</span></div>'+
+        '<div id="settingsProjList"></div>'+
       '</div>'+
 
       '<div class="modal-actions"><button class="btn btn-ghost" onclick="App.closeModal()">关闭</button></div>');
@@ -4184,9 +4183,8 @@ const App = {
 
   openProjectManagementModal(){
     this.showModal('⚙ 项目管理',
-      '<div style="margin-bottom:14px;font-size:12px;color:var(--text-sec)">在此处新建、编辑、删除项目。删除项目将同时删除关联子任务、进度、待办和思考记录。</div>'+
-      '<div id="projMgmtList" style="margin-bottom:10px"></div>'+
-      '<button class="btn btn-primary btn-sm" onclick="App.openProjectModal()">+ 新建项目</button>'+
+      '<div style="margin-bottom:14px;font-size:12px;color:var(--text-sec)">在此处新建、编辑、删除项目。点击维度右侧按钮可新建该维度的项目。</div>'+
+      '<div id="projMgmtList"></div>'+
       '<div class="modal-actions"><button class="btn btn-ghost" onclick="App.closeModal()">关闭</button></div>'
     );
     this.renderProjMgmtList();
@@ -4195,9 +4193,11 @@ const App = {
   renderProjMgmtList(){
     const el=document.getElementById('projMgmtList');
     if(!el)return;
-    el.innerHTML=this.data.projects.length?this.data.projects.map(p=>{
+    const cats=this.getCategories();
+    let html='';
+    const renderProjItem=(p)=>{
       const subs=this.subByProj(p.id);
-      let html='<div class="pmg-item" style="padding:10px 14px;background:var(--bg);border-radius:8px;margin-bottom:8px">'+
+      let h='<div class="pmg-item" style="padding:10px 14px;background:var(--bg);border-radius:8px;margin-bottom:8px">'+
         '<div class="proj-mgmt-row pmg-header" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">'+
           '<span class="tag '+this.catCls(p.category)+'" style="'+this.catTagStyle(p.category)+';font-size:10px">'+this.catLabel(p.category)+'</span>'+
           '<span class="proj-name" style="flex:1;font-size:13px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+this.esc(p.name)+'</span>'+
@@ -4210,26 +4210,50 @@ const App = {
           '</div>'+
         '</div>';
       if(subs.length){
-        html+='<div class="pmg-subs" style="margin-top:6px;padding-left:12px;border-left:2px solid var(--border)">';
+        h+='<div class="pmg-subs" style="margin-top:6px;padding-left:12px;border-left:2px solid var(--border)">';
         subs.forEach(s=>{
-          html+='<div class="proj-mgmt-row pmg-sub-row" style="display:flex;align-items:center;gap:6px;padding:4px 0;font-size:12px;flex-wrap:wrap">'+
+          h+='<div class="proj-mgmt-row pmg-sub-row" style="display:flex;align-items:center;gap:6px;padding:4px 0;font-size:12px;flex-wrap:wrap">'+
             '<span class="tag '+this.statusCls(s.status)+'" style="font-size:10px">'+s.status+'</span>'+
             '<span class="proj-name" style="flex:1;color:var(--text-sec);min-width:60px">'+this.esc(s.name)+'</span>'+
             '<button class="btn btn-ghost btn-sm" onclick="App.openSubtaskModal(\''+p.id+'\',\''+s.id+'\')" style="font-size:10px">编辑</button>'+
             '<button class="btn btn-ghost btn-sm" onclick="App.delSubtask(\''+s.id+'\')" style="color:var(--danger);font-size:10px">删除</button>'+
           '</div>';
         });
-        html+='</div>';
+        h+='</div>';
       }
+      h+='</div>';
+      return h;
+    };
+    cats.forEach(c=>{
+      const projs=this.data.projects.filter(p=>p.category===c.key);
+      html+='<div style="margin-bottom:14px">'+
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:4px 0;border-bottom:2px solid '+c.color+'">'+
+          '<span class="cat-dot" style="background:'+c.color+';width:10px;height:10px;border-radius:50%;display:inline-block"></span>'+
+          '<span style="font-size:13px;font-weight:700;color:var(--text)">'+this.esc(c.label)+'</span>'+
+          '<span style="font-size:11px;color:var(--text-light)">'+projs.length+'个项目</span>'+
+          '<button class="btn btn-primary btn-sm" style="margin-left:auto;font-size:11px;padding:3px 10px" onclick="App.openProjectModal(null,\''+c.key+'\')">+ 新建项目</button>'+
+        '</div>';
+      if(projs.length){projs.forEach(p=>{html+=renderProjItem(p)})}
       html+='</div>';
-      return html;
-    }).join(''):'<div style="font-size:12px;color:var(--text-light)">暂无项目</div>';
+    });
+    /* Uncategorized projects */
+    const uncategorized=this.data.projects.filter(p=>!cats.find(c=>c.key===p.category));
+    if(uncategorized.length){
+      html+='<div style="margin-bottom:14px">'+
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:4px 0;border-bottom:2px solid var(--border)">'+
+          '<span style="font-size:13px;font-weight:700;color:var(--text-light)">未分类</span>'+
+          '<span style="font-size:11px;color:var(--text-light)">'+uncategorized.length+'个项目</span>'+
+          '<button class="btn btn-ghost btn-sm" style="margin-left:auto;font-size:11px;padding:3px 10px" onclick="App.openProjectModal()">+ 新建项目</button>'+
+        '</div>';
+      uncategorized.forEach(p=>{html+=renderProjItem(p)});
+      html+='</div>';
+    }
+    el.innerHTML=html||'<div style="font-size:12px;color:var(--text-light)">暂无项目</div>';
   },
 
   renderSettingsProjList(){
     const el=document.getElementById('settingsProjList');
     if(!el)return;
-    if(!this.data.projects.length){el.innerHTML='<div style="font-size:12px;color:var(--text-light)">暂无项目，点击下方按钮创建</div>';return}
     const cats=this.getCategories();
     let html='';
     const renderProjItem=(p)=>{
@@ -4262,14 +4286,14 @@ const App = {
     };
     cats.forEach(c=>{
       const projs=this.data.projects.filter(p=>p.category===c.key);
-      if(!projs.length)return;
       html+='<div style="margin-bottom:14px">'+
         '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:4px 0;border-bottom:2px solid '+c.color+'">'+
           '<span class="cat-dot" style="background:'+c.color+';width:10px;height:10px;border-radius:50%;display:inline-block"></span>'+
           '<span style="font-size:13px;font-weight:700;color:var(--text)">'+this.esc(c.label)+'</span>'+
           '<span style="font-size:11px;color:var(--text-light)">'+projs.length+'个项目</span>'+
+          '<button class="btn btn-primary btn-sm" style="margin-left:auto;font-size:11px;padding:3px 10px" onclick="App.openProjectModal(null,\''+c.key+'\')">+ 新建项目</button>'+
         '</div>';
-      projs.forEach(p=>{html+=renderProjItem(p)});
+      if(projs.length){projs.forEach(p=>{html+=renderProjItem(p)})}
       html+='</div>';
     });
     /* Uncategorized projects */
@@ -4279,11 +4303,12 @@ const App = {
         '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:4px 0;border-bottom:2px solid var(--border)">'+
           '<span style="font-size:13px;font-weight:700;color:var(--text-light)">未分类</span>'+
           '<span style="font-size:11px;color:var(--text-light)">'+uncategorized.length+'个项目</span>'+
+          '<button class="btn btn-ghost btn-sm" style="margin-left:auto;font-size:11px;padding:3px 10px" onclick="App.openProjectModal()">+ 新建项目</button>'+
         '</div>';
       uncategorized.forEach(p=>{html+=renderProjItem(p)});
       html+='</div>';
     }
-    el.innerHTML=html;
+    el.innerHTML=html||'<div style="font-size:12px;color:var(--text-light)">暂无项目</div>';
   },
 
   /* ---- Thought Type Management (inline UI, no prompt/confirm) ---- */
@@ -4381,17 +4406,18 @@ const App = {
   },
 
   /* ---- Project Management ---- */
-  openProjectModal(id){
+  openProjectModal(id, defaultCategory){
     if(document.getElementById('projMgmtList'))this._modalReturnTo='projMgmt';
     else if(document.getElementById('settingsProjList'))this._modalReturnTo='settings';
     else this._modalReturnTo=null;
     const p=id?this.data.projects.find(x=>x.id===id):null;
     if(id){this._tempSubtasks=this.subByProj(id).map(s=>({id:s.id,name:s.name}))}
     else{this._tempSubtasks=[]}
+    const defCat = p?p.category:(defaultCategory||'');
     this.showModal(p?'编辑项目':'新建项目',
       '<div class="form-group"><label>项目名称 <span class="opt">*</span></label><input type="text" id="pjName" value="'+(p?this.esc(p.name):'')+'" placeholder="如：XX-100量产调试"></div>'+
       '<div class="form-group"><label>分类</label><select id="pjCat">'+
-          this.getCategories().map(c=>'<option value="'+c.key+'" '+(p&&p.category===c.key?'selected':'')+'>'+c.label+'</option>').join('')+'</select></div>'+
+          this.getCategories().map(c=>'<option value="'+c.key+'" '+(defCat===c.key?'selected':'')+'>'+c.label+'</option>').join('')+'</select></div>'+
       '<div class="form-row">'+
         '<div class="form-group"><label>状态 <span class="opt">（保存后根据子任务自动同步）</span></label><select id="pjStatus"><option value="待开始" '+(p&&p.status==='待开始'?'selected':'')+'>待开始</option><option value="进行中" '+(p&&p.status==='进行中'?'selected':'')+'>进行中</option><option value="已完成" '+(p&&p.status==='已完成'?'selected':'')+'>已完成</option></select></div>'+
         '<div class="form-group"><label>创建日期</label><input type="date" id="pjDate" value="'+(p?p.createdAt:this.today())+'"></div>'+
