@@ -132,12 +132,12 @@ select option{font-size:13px;padding:2px 6px}
 .pbar{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
 .pbar-fill{height:100%;border-radius:3px;transition:width .3s}
 
-.filter-bar{display:flex;gap:5px;align-items:center;flex-wrap:nowrap;margin-bottom:12px;width:100%;overflow:hidden}
-.filter-bar select{width:auto;min-width:65px;flex:1 1 0;max-width:none;text-overflow:ellipsis;white-space:nowrap;overflow:hidden}
+.filter-bar{display:flex;gap:6px;align-items:center;flex-wrap:nowrap;margin-bottom:12px;width:100%;overflow:hidden}
+.filter-bar select{width:auto;min-width:120px;flex:1 1 0;max-width:none;text-overflow:ellipsis;white-space:nowrap;overflow:hidden}
 .filter-bar .search-box{flex:2 1 0;min-width:100px;width:100%}
 .filter-bar .search-box input{width:100%}
 .filter-bar::-webkit-scrollbar{display:none}
-.filter-bar input[type=date]{min-width:90px;flex:1 1 auto}
+.filter-bar input[type=date]{min-width:80px;flex:1 1 auto}
 .filter-bar span{flex-shrink:0}
 
 .empty{text-align:center;padding:44px 20px;color:var(--text-light)}
@@ -385,9 +385,9 @@ select option{font-size:13px;padding:2px 6px}
   .quick-actions{gap:6px;margin-bottom:10px;flex-wrap:wrap}
   .quick-btn{padding:7px 10px;font-size:12px;flex:1 1 calc(50% - 6px);min-width:0;white-space:nowrap}
   .quick-btn .qi{font-size:14px}
-  .filter-bar{gap:4px;flex-wrap:nowrap}
-  .filter-bar select{min-width:60px;font-size:12px}
-  .filter-bar input{min-width:80px;font-size:12px}
+  .filter-bar{gap:5px;flex-wrap:nowrap}
+  .filter-bar select{min-width:100px;font-size:12px}
+  .filter-bar input{min-width:70px;font-size:12px}
   .filter-bar .search-box{min-width:90px}
   select{font-size:13px}
   select option{font-size:13px}
@@ -451,9 +451,9 @@ select option{font-size:13px;padding:2px 6px}
   .cal-day .cal-stamp{width:18px;height:18px;font-size:7px}
   .chart-bar .label{width:60px;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .chart-bar .bar-count{font-size:10px}
-  .filter-bar select{min-width:55px;font-size:11px}
-  .filter-bar input{min-width:70px;font-size:11px}
-  .filter-bar{gap:3px;flex-wrap:nowrap}
+  .filter-bar select{min-width:85px;font-size:11px}
+  .filter-bar input{min-width:60px;font-size:11px}
+  .filter-bar{gap:4px;flex-wrap:nowrap}
   #dailySubSelect{min-width:100px!important}
   #rvFrom,#rvTo{min-width:90px!important}
   /* Project management: compact buttons on narrow screens */
@@ -1917,13 +1917,11 @@ const App = {
     const cats=this.getCategories();
     document.getElementById('progressTabContent').innerHTML=
       '<div class="filter-bar">'+
+        '<select id="pfCat" onchange="App.filterProgress()"><option value="">全部维度</option>'+
+          cats.map(c=>'<option value="'+c.key+'">'+c.label+'</option>').join('')+'</select>'+
         '<select id="pfProj" onchange="App.filterProgress()"><option value="">全部项目</option>'+
           this.data.projects.map(p=>'<option value="'+p.id+'">'+p.name+'</option>').join('')+'</select>'+
         '<select id="pfSub" onchange="App.filterProgress()"><option value="">全部子任务</option></select>'+
-        '<select id="pfCat" onchange="App.filterProgress()"><option value="">全部分类</option>'+
-          cats.map(c=>'<option value="'+c.key+'">'+c.label+'</option>').join('')+'</select>'+
-        '<select id="pfTask" onchange="App.filterProgress()"><option value="">全部任务</option>'+
-          [...new Set(this.data.projects.map(p=>p.task))].map(m=>'<option value="'+m+'">'+m+'</option>').join('')+'</select>'+
         '<input type="date" id="pfFrom" onchange="App.filterProgress()">'+
         '<span style="color:var(--text-light)">—</span>'+
         '<input type="date" id="pfTo" onchange="App.filterProgress()">'+
@@ -1944,7 +1942,6 @@ const App = {
     const pid=document.getElementById('pfProj').value;
     const sid=document.getElementById('pfSub').value;
     const cat=document.getElementById('pfCat').value;
-    const task=document.getElementById('pfTask').value;
     const from=document.getElementById('pfFrom').value;
     const to=document.getElementById('pfTo').value;
 
@@ -1960,7 +1957,6 @@ const App = {
     subs=subs.filter(s=>{
       const proj=this.projById(s.projectId);
       if(cat&&proj.category!==cat)return false;
-      if(task&&proj.task!==task)return false;
       return true;
     });
 
@@ -1972,7 +1968,6 @@ const App = {
         if(hasSubs)return false;
         if(pid&&p.id!==pid)return false;
         if(cat&&p.category!==cat)return false;
-        if(task&&p.task!==task)return false;
         return p.status==='进行中';
       });
     }
@@ -2017,7 +2012,6 @@ const App = {
     records=records.filter(p=>{
       const proj=this.projById(p.projectId);
       if(cat&&proj.category!==cat)return false;
-      if(task&&proj.task!==task)return false;
       if(from&&p.date<from)return false;
       if(to&&p.date>to)return false;
       return true;
