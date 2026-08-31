@@ -531,7 +531,7 @@ select option{font-size:13px;padding:2px 6px}
       </div>
       <div class="desc">
         通过 <b>Supabase</b> 免费实现多设备数据同步。<br>
-        数据存储在你自己的 Supabase 项目中，邮箱登录后自动同步。
+        只需填写项目 URL 和 anon key，即可自动同步；多台设备用同一配置即可互通数据。
       </div>
       <div class="form-group">
         <label>Supabase URL <span class="opt">必填</span></label>
@@ -540,14 +540,6 @@ select option{font-size:13px;padding:2px 6px}
       <div class="form-group">
         <label>anon public key <span class="opt">必填</span></label>
         <input type="text" id="cs_anonKey" placeholder="eyJhbGciOi...">
-      </div>
-      <div class="form-group">
-        <label>邮箱 <span class="opt">必填</span></label>
-        <input type="email" id="cs_email" placeholder="you@example.com">
-      </div>
-      <div class="form-group">
-        <label>密码 <span class="opt">必填，仅本次登录使用，不会保存</span></label>
-        <input type="password" id="cs_password" placeholder="登录密码">
       </div>
       <details class="cloud-sync-help">
         <summary>📝 如何配置 Supabase 同步？（点击展开教程）</summary>
@@ -559,14 +551,13 @@ select option{font-size:13px;padding:2px 6px}
             进入项目 <b>Settings → API</b>，复制 <code>Project URL</code> 和 <code>anon public</code> 密钥。
           </div>
           <div class="cloud-sync-step"><b>第 3 步</b> — 建表（SQL Editor 执行）：<br>
-            <code>create table app_data (user_id uuid primary key references auth.users(id), data jsonb not null, updated_at timestamptz default now());</code><br>
-            <code>alter table app_data enable row level security;</code><br>
-            <code>create policy "读写自己的数据" on app_data for all using (auth.uid() = user_id) with check (auth.uid() = user_id);</code>
+            <code>create table app_data (sync_key text primary key default 'main', data jsonb not null, updated_at timestamptz default now());</code>
           </div>
-          <div class="cloud-sync-step"><b>第 4 步</b> — 开启邮箱登录并建账号：<br>
-            进入 <b>Authentication → Providers → Email</b> 确认已启用；再到 <b>Authentication → Users</b> 点 <b>Add user</b>，填邮箱和密码创建账号。
+          <div class="cloud-sync-step"><b>第 4 步</b> — 关闭 RLS（或开放策略，SQL Editor 执行）：<br>
+            <code>alter table app_data disable row level security;</code><br>
+            <span style="color:var(--text-light)">（此方案无需邮箱登录，建议使用独立的 Supabase 项目专门存放工作台数据，避免与其他业务混用。）</span>
           </div>
-          <div class="cloud-sync-step"><b>第 5 步</b> — 把 URL、anon key、邮箱、密码填入本表单，点保存即可。多台设备用同一账号登录即自动同步。</div>
+          <div class="cloud-sync-step"><b>第 5 步</b> — 把 URL 和 anon key 填入本表单，点保存即可。多台设备用同一配置即可自动同步。</div>
         </div>
       </details>
       <div class="cloud-sync-actions">
@@ -2121,7 +2112,7 @@ const App = {
         return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border-radius:8px;margin-bottom:8px">'+
           '<span style="font-size:16px">'+(t.status==='completed'?'✅':'⭐')+'</span>'+
           '<div style="flex:1"><div style="font-weight:600;font-size:13px;'+(t.status==='completed'?'text-decoration:line-through;color:var(--text-light)':'')+'">'+this.esc(t.title)+'</div>'+
-          '<div style="font-size:11px;color:var(--text-light)">'+(proj?proj.name+(sub?' / '+sub.name:''):'未绑定')+(isOverdue?' · <span style="color:var(--danger)">超期'+this.daysAgo(t.dueDate)+'天</span>':'')+'</div></div>'+
+          '<div style="font-size:11px;color:var(--text-light)">'+(proj?proj.name+(sub?' / '+sub.name:''):'未绑定')+(isOverdue?' · <span style="color:var(--danger);white-space:nowrap">超期'+this.daysAgo(t.dueDate)+'天</span>':'')+'</div></div>'+
           (t.status==='pending'?'<button class="btn btn-primary btn-sm" onclick="App.toggleTodoFromDash(\''+t.id+'\')">完成</button>':'')+
         '</div>';
       }).join(''):'<div class="empty"><div class="text">暂无星标待办</div></div>')+
@@ -2281,13 +2272,14 @@ const App = {
         '<div class="td-meta">'+
           '<button class="star-inline '+(t.starred?'active':'')+'" onclick="App.toggleTodoStar(\''+t.id+'\')" style="font-size:13px;padding:0 2px">'+(t.starred?'⭐':'☆')+'</button>'+
           '<span class="td-due">📅 <input type="date" value="'+(t.dueDate||'')+'" onchange="App.inlineSaveTodo(\''+t.id+'\',\'dueDate\',this.value)" title="点击修改截止日期"'+(isDone?' disabled':'')+'>'+
-          (isOverdue?'<span style="color:var(--danger);font-size:10px">超期'+this.daysAgo(t.dueDate)+'天</span>':'')+
+          (isOverdue?'<span style="color:var(--danger);font-size:10px;white-space:nowrap;flex-shrink:0">超期'+this.daysAgo(t.dueDate)+'天</span>':'')+
           '</span>'+
           (sub?'<span class="td-bind">'+this.esc(sub.name)+'</span>':'')+
           (isDone?'<span class="tag tag-done" style="font-size:10px">已完成</span>':'<span class="tag tag-progress" style="font-size:10px">待办中</span>')+
         '</div>'+
       '</div>'+
       '<div class="td-actions">'+
+        '<button class="btn btn-ghost btn-sm" onclick="App.editTodo(\''+t.id+'\')" style="font-size:11px" title="编辑待办（可修改绑定的项目/子任务）">编辑</button>'+
         '<button class="btn btn-ghost btn-sm" onclick="App.delTodo(\''+t.id+'\')" style="color:var(--danger);font-size:11px">删除</button>'+
       '</div>'+
     '</div>';
@@ -2432,11 +2424,22 @@ const App = {
     if(!title){this.toast('请输入标题','error');return}
     const data={title,projectId:document.getElementById('tdProj').value||null,subtaskId:document.getElementById('tdSub').value||null,
       dueDate:document.getElementById('tdDue').value};
-    if(id){Object.assign(this.data.todos.find(t=>t.id===id),data)}
+    if(id){
+      const todo=this.data.todos.find(t=>t.id===id);
+      Object.assign(todo,data);
+      /* 防御：若子任务不属于当前绑定的项目，自动解除子任务绑定 */
+      if(todo.subtaskId){
+        const s=this.subById(todo.subtaskId);
+        if(!s||s.projectId!==todo.projectId)todo.subtaskId=null;
+      }
+    }
     else{this.data.todos.push({id:this.uid(),...data,status:'pending',createdAt:this.today(),completedDate:null,starred:false})}
     this.saveData();this.closeModal();this.toast('保存成功','success');
-    this.renderNav();try{this.renderTodoList()}catch(e){}
-    if(this.currentPage==='dashboard')this.renderDashboard();
+    this.renderNav();
+    /* 待办中心：仅刷新列表，保留筛选/分组状态；其他页面（总览/复盘中心）整页刷新，
+       使重新绑定项目后的待办在总览统计和复盘项目详情中同步"转接"到新项目 */
+    if(this.currentPage==='todos'){try{this.renderTodoList()}catch(e){}}
+    else{this.renderCurrentPage()}
   },
 
   editTodo(id){this.openTodoModal(id)},
@@ -4678,8 +4681,7 @@ window.addEventListener('resize',function(){
 /* ========== Cloud Sync (Supabase) ========== */
 const CloudSync = {
   CONFIG_KEY: 'cloudsync_supabase_v1',
-  LAST_ACCESS_KEY: 'cloudsync_last_access_v1',
-  INACTIVE_LIMIT: 7 * 24 * 60 * 60 * 1000, // 7天未访问则自动清除登录
+  SYNC_KEY: 'main', // 固定同步键，同一项目共享同一数据行
   config: null,
   client: null,
   pushTimer: null,
@@ -4700,20 +4702,6 @@ const CloudSync = {
     this.updateIndicator();
   },
 
-  // 安全策略：检查是否超过 7 天未访问
-  checkInactive(){
-    try{
-      const raw = localStorage.getItem(this.LAST_ACCESS_KEY);
-      if(!raw) return false;            // 首次访问，未记录
-      const last = parseInt(raw, 10);
-      if(isNaN(last)) return false;
-      return (Date.now() - last) > this.INACTIVE_LIMIT;
-    }catch(e){ return false; }
-  },
-  touchAccess(){
-    try{ localStorage.setItem(this.LAST_ACCESS_KEY, String(Date.now())); }catch(e){}
-  },
-
   initClient(){
     if(!this.config || !this.config.url || !this.config.anonKey) return false;
     if(this.client) return true;
@@ -4727,23 +4715,14 @@ const CloudSync = {
   },
   isConfigured(){ return !!(this.config && this.config.url && this.config.anonKey && this.client); },
 
-  async _getSession(){
-    if(!this.isConfigured()) return null;
-    try{
-      const { data: { session } } = await this.client.auth.getSession();
-      return session;
-    }catch(e){ return null; }
-  },
-
   async pull(){
     if(!this.isConfigured()) return null;
     this.pulling = true;
     try{
-      const session = await this._getSession();
-      if(!session){ this.setStatus('未登录','error'); return null; }
       const { data, error } = await this.client
         .from('app_data')
         .select('data')
+        .eq('sync_key', this.SYNC_KEY)
         .maybeSingle();
       if(error){
         this.setStatus('拉取失败 '+(error.message||''),'error');
@@ -4767,15 +4746,11 @@ const CloudSync = {
     this.updateIndicator('syncing');
     this.pushTimer = setTimeout(async () => {
       try{
-        const session = await this._getSession();
-        if(!session || !session.user){
-          this.setStatus('未登录','error'); this.updateIndicator('error'); return;
-        }
         const payload = JSON.parse(JSON.stringify(App.data));
         payload._syncAt = Date.now();
         const { error } = await this.client
           .from('app_data')
-          .upsert({ user_id: session.user.id, data: payload, updated_at: new Date().toISOString() });
+          .upsert({ sync_key: this.SYNC_KEY, data: payload, updated_at: new Date().toISOString() });
         if(!error){
           App.data._syncAt = payload._syncAt;
           this.lastPushedAt = payload._syncAt;
@@ -4794,50 +4769,34 @@ const CloudSync = {
 
   async init(){
     this.loadConfig();
-    // 安全策略：超过 7 天未访问，清除登录信息，不恢复会话也不拉取云端数据
-    if(this.config && this.checkInactive()){
-      try{ if(this.initClient()) await this.client.auth.signOut(); }catch(e){}
-      localStorage.removeItem(this.CONFIG_KEY);
-      localStorage.removeItem('cloudsync_config_v1');
-      localStorage.removeItem(this.LAST_ACCESS_KEY);
-      this.config = null;
-      this.client = null;
-      this.updateIndicator('none');
-      this.toast('超过 7 天未访问，为安全已自动退出登录，请重新配置云同步');
+    if(this.initClient()){
+      this.updateIndicator('ok');
+      const remote = await this.pull();
+      if(remote && !remote.empty){
+        const localSyncAt = App.data._syncAt || 0;
+        const remoteSyncAt = remote._syncAt || 0;
+        if(remoteSyncAt > localSyncAt){
+          // Remote newer: overwrite local
+          App.data = remote;
+          try{ delete App.data._syncAt; }catch(e){}
+          CloudSync._suppressPush = true;
+          App.saveData();
+          CloudSync._suppressPush = false;
+          if(typeof App.renderNav === 'function') App.renderNav();
+          if(typeof App.navigate === 'function') App.navigate(App.currentPage || 'dashboard');
+          this.toast('已从云端同步最新数据');
+        }else if(localSyncAt > remoteSyncAt){
+          this.push();
+        }else{
+          this.setStatus('已同步','ok');
+        }
+      }else if(remote && remote.empty){
+        // Remote empty, push local
+        this.push();
+      }
       return;
     }
-    this.touchAccess();
-    if(this.initClient()){
-      const session = await this._getSession();
-      if(session){
-        this.updateIndicator('ok');
-        const remote = await this.pull();
-        if(remote && !remote.empty){
-          const localSyncAt = App.data._syncAt || 0;
-          const remoteSyncAt = remote._syncAt || 0;
-          if(remoteSyncAt > localSyncAt){
-            // Remote newer: overwrite local
-            App.data = remote;
-            try{ delete App.data._syncAt; }catch(e){}
-            CloudSync._suppressPush = true;
-            App.saveData();
-            CloudSync._suppressPush = false;
-            if(typeof App.renderNav === 'function') App.renderNav();
-            if(typeof App.navigate === 'function') App.navigate(App.currentPage || 'dashboard');
-            this.toast('已从云端同步最新数据');
-          }else if(localSyncAt > remoteSyncAt){
-            this.push();
-          }else{
-            this.setStatus('已同步','ok');
-          }
-        }else if(remote && remote.empty){
-          // Remote empty, push local
-          this.push();
-        }
-        return;
-      }
-    }
-    // Not configured or not logged in
+    // Not configured
     this.updateIndicator('none');
     setTimeout(() => {
       if(!this.isConfigured()) this.toast('点击左下角 ☁ 配置 Supabase 云同步，实现多设备数据同步');
@@ -4879,11 +4838,8 @@ const CloudSync = {
     if(!modal) return;
     const url = (this.config && this.config.url) || '';
     const anonKey = (this.config && this.config.anonKey) || '';
-    const email = (this.config && this.config.email) || '';
     document.getElementById('cs_url').value = url;
     document.getElementById('cs_anonKey').value = anonKey;
-    document.getElementById('cs_email').value = email;
-    document.getElementById('cs_password').value = '';
     this.updateIndicator(this.isConfigured() ? 'ok' : 'none');
     modal.classList.add('show');
   },
@@ -4892,10 +4848,8 @@ const CloudSync = {
   async saveSettings(){
     const url = document.getElementById('cs_url').value.trim();
     const anonKey = document.getElementById('cs_anonKey').value.trim();
-    const email = document.getElementById('cs_email').value.trim();
-    const password = document.getElementById('cs_password').value;
-    if(!url || !anonKey || !email || !password){
-      this.toast('请填写完整信息');
+    if(!url || !anonKey){
+      this.toast('请填写 URL 和 anon key');
       return;
     }
     this.setStatus('连接中…','syncing');
@@ -4903,7 +4857,7 @@ const CloudSync = {
     const changed = !this.config || this.config.url !== url || this.config.anonKey !== anonKey;
     if(changed){
       this.client = null;
-      this.config = { url, anonKey, email };
+      this.config = { url, anonKey };
     }
     if(!this.initClient()){
       this.toast('Supabase 初始化失败，请检查 URL 和 anon key');
@@ -4911,18 +4865,17 @@ const CloudSync = {
       this.updateIndicator('error');
       return;
     }
-    const { data, error } = await this.client.auth.signInWithPassword({ email, password });
-    if(error){
-      this.toast('登录失败：'+error.message);
-      this.setStatus('登录失败','error');
+    // 尝试拉取验证连接与表配置
+    const remote = await this.pull();
+    if(remote === null){
+      // pull 返回 null 表示出错（已在 pull 内设置错误状态）
       this.updateIndicator('error');
+      this.toast('连接失败，请检查 URL/key 及 app_data 表是否按教程创建');
       return;
     }
-    // 登录成功，持久化配置（不含密码）
-    this.saveConfig({ url, anonKey, email });
-    this.touchAccess();
+    // 连接成功，持久化配置
+    this.saveConfig({ url, anonKey });
     this.updateIndicator('ok');
-    const remote = await this.pull();
     if(remote && !remote.empty){
       const localSyncAt = App.data._syncAt || 0;
       const remoteSyncAt = remote._syncAt || 0;
@@ -4934,19 +4887,20 @@ const CloudSync = {
         CloudSync._suppressPush = false;
         if(typeof App.renderNav === 'function') App.renderNav();
         if(typeof App.navigate === 'function') App.navigate(App.currentPage || 'dashboard');
-        this.toast('登录成功，已同步云端数据');
+        this.toast('配置成功，已同步云端数据');
         this.closeModal();
       }else{
         this.push();
-        this.toast('登录成功，正在上传本地数据');
+        this.toast('配置成功，正在上传本地数据');
         this.closeModal();
       }
     }else if(remote && remote.empty){
       this.push();
-      this.toast('登录成功，正在上传本地数据');
+      this.toast('配置成功，正在上传本地数据');
       this.closeModal();
     }else{
-      this.toast('登录成功，但拉取数据失败，请检查 app_data 表与 RLS 策略');
+      this.toast('配置成功');
+      this.closeModal();
     }
   },
 
@@ -4982,20 +4936,14 @@ const CloudSync = {
   },
 
   async clearConfig(){
-    if(!confirm('确定要清除云同步配置吗？\n本地数据不会被删除，仅退出登录并停止云同步。')) return;
-    try{
-      if(this.client) await this.client.auth.signOut();
-    }catch(e){}
+    if(!confirm('确定要清除云同步配置吗？\n本地数据不会被删除，仅停止云同步。')) return;
     localStorage.removeItem(this.CONFIG_KEY);
     localStorage.removeItem('cloudsync_config_v1'); // 顺便清理旧的 Gist 配置
-    localStorage.removeItem(this.LAST_ACCESS_KEY);   // 清除访问时间记录
     this.config = null;
     this.client = null;
     this.updateIndicator('none');
     document.getElementById('cs_url').value = '';
     document.getElementById('cs_anonKey').value = '';
-    document.getElementById('cs_email').value = '';
-    document.getElementById('cs_password').value = '';
     this.toast('已清除云同步配置');
   }
 };
