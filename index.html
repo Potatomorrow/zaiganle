@@ -168,8 +168,7 @@ select option{font-size:13px;padding:2px 6px}
 /* timeline variant used in subtask detail */
 .tl-card{border-left:3px solid var(--primary-light);border-radius:0 9px 9px 0;padding:10px 14px;margin-bottom:8px;background:var(--card);box-shadow:var(--shadow);transition:box-shadow .2s;position:relative}
 .tl-card:hover{box-shadow:var(--shadow-lg)}
-.tl-card .tl-meta{margin-bottom:6px}
-.tl-card .tl-date{font-size:11px;color:var(--text-light);font-weight:500}
+.tl-card .tl-date{font-size:11px;color:var(--text-sec);font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
 .tl-card .tl-body p{font-size:13px;margin-bottom:4px;line-height:1.6}
 .tl-card .tl-body .fl{font-weight:600;font-size:12px;margin-right:4px;flex-shrink:0;line-height:1.6}
 .tl-card .tl-body p{overflow-wrap:anywhere}
@@ -1921,14 +1920,13 @@ const App = {
       const proj=this.projById(r.projectId);
       const title=sub?sub.name:(proj?'📁 '+proj.name:'');
       return '<div class="tl-card">'+
-        '<div class="tl-meta">'+
-          '<div class="tl-body">'+
-          '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">'+
+        '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap">'+
+            '<span class="tl-date">'+this.fmtDateFull(r.date)+'</span>'+
             '<span class="tag '+this.catCls(proj.category)+'" style="'+this.catTagStyle(proj.category)+'">'+this.catLabel(proj.category)+'</span>'+
             '<span style="font-weight:600;font-size:13px">'+this.esc(title)+'</span>'+
             '<span style="font-size:11px;color:var(--text-light)">'+proj.name+'</span>'+
-            '<span class="tl-date" style="margin-left:auto">'+this.fmtDateFull(r.date)+'</span>'+
           '</div>'+
+        '<div class="tl-body">'+
           (r.progress&&r.progress!=='无更新'?'<p style="display:flex;align-items:flex-start"><span class="fl" style="color:var(--text)">进度：</span><span>'+this.escNl(r.progress)+'</span></p>':'')+
           (r.progress==='无更新'?'<p style="color:var(--text-light);font-style:italic">无更新</p>':'')+
           (r.issues?'<p style="display:flex;align-items:flex-start"><span class="fl" style="color:var(--danger)">问题：</span><span>'+this.escNl(r.issues)+'</span></p>':'')+
@@ -1950,7 +1948,6 @@ const App = {
     document.getElementById('pfProj').value=pid;
     document.getElementById('pfSub').value='';
     document.getElementById('pfCat').value='';
-    document.getElementById('pfTask').value='';
     this.filterProgress();
     document.getElementById('progTimeline').scrollIntoView({behavior:'smooth'});
   },
@@ -2942,15 +2939,19 @@ const App = {
     this.switchReview(this.reviewTab||'project');
   },
 
+  /* 同步复盘中心顶部 Tab 高亮（项目复盘=0，时间复盘=1） */
+  setReviewTabActive(tab){
+    const tabs=document.querySelectorAll('#reviewTabs .tab');
+    tabs.forEach(t=>t.classList.remove('active'));
+    const idx=tab==='project'?0:1;
+    if(tabs[idx])tabs[idx].classList.add('active');
+  },
+
   switchReview(tab,el){
     this.reviewTab=tab;
     document.querySelectorAll('#reviewTabs .tab').forEach(t=>t.classList.remove('active'));
     if(el)el.classList.add('active');
-    else{
-      const idx=tab==='project'?0:1;
-      const tabs=document.querySelectorAll('#reviewTabs .tab');
-      if(tabs[idx])tabs[idx].classList.add('active');
-    }
+    else this.setReviewTabActive(tab);
     if(tab==='project'){this.reviewProjectId=null;this.reviewSubtaskId=null;this.renderProjectReview();return}
     this.reviewProjectId=null;this.reviewSubtaskId=null;
     this.renderTimeReview();
@@ -3077,12 +3078,13 @@ const App = {
         (progs.length?progs.map(p=>{
           const sub=this.subById(p.subtaskId);
           const proj=this.projById(p.projectId);
-          return '<div class="proj-review-card" style="cursor:default;margin-bottom:8px" onclick="App.openReviewProjectDetail(\''+p.projectId+'\')">'+
+          return '<div class="proj-review-card" style="margin-bottom:8px" title="点击查看该任务的项目复盘" onclick="App.gotoProgressInProjectReview(\''+p.id+'\')">'+
             '<div class="prc-header">'+
               '<span class="tag '+this.catCls(p.category)+'" style="'+this.catTagStyle(p.category)+'">'+this.catLabel(p.category)+'</span>'+
               '<span class="prc-name">'+this.esc(sub?.name||proj?.name||'')+'</span>'+
               '<span style="font-size:11px;color:var(--text-light)">'+(proj?.name||'')+' · '+p.task+'</span>'+
               '<span style="margin-left:auto;font-size:11px;color:var(--text-light)">'+this.fmtDateFull(p.date)+'</span>'+
+              '<button class="btn btn-ghost btn-sm" style="font-size:11px;padding:2px 9px;flex-shrink:0" onclick="event.stopPropagation();App.openEditProgress(\''+p.id+'\',\'time\')">✏️ 编辑</button>'+
             '</div>'+
             '<div style="font-size:13px;color:var(--text-sec);margin-bottom:4px">'+this.escNl(p.progress||'无更新')+'</div>'+
             '<div class="prc-stats">'+
@@ -3118,15 +3120,75 @@ const App = {
     if(el)el.scrollIntoView({behavior:'smooth'});
   },
 
-  openReviewProjectDetail(pid){
-    this.reviewProjectId=pid;
+  /* 从时间复盘跳转到「项目复盘」中的对应任务位置：
+     有子任务 → 打开子任务详情；无子任务 → 打开项目详情 */
+  gotoProgressInProjectReview(rid){
+    const r=this.data.progress.find(x=>x.id===rid);
+    if(!r){this.toast('找不到该记录','error');return}
+    const sub=r.subtaskId?this.subById(r.subtaskId):null;
+    const proj=this.projById(sub?sub.projectId:r.projectId);
+    if(!proj){this.toast('所属项目已不存在','error');return}
     this.reviewTab='project';
-    this.renderProjectReview();
+    this.reviewProjectId=proj.id;
+    this.reviewSubtaskId=sub?sub.id:null;
+    this.setReviewTabActive('project');
+    if(this.reviewSubtaskId)this.renderSubtaskDetail();
+    else this.renderProjectDetail();
+    const el=document.getElementById('reviewContent');
+    if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
   },
 
   exportReviewProgress(){
     const from=this.reviewFrom||'';const to=this.reviewTo||'';
     this.exportProgress(from,to);
+  },
+
+  /* ---- 编辑进展记录（时间复盘 / 子任务详情 通用） ----
+     back='time' → 保存后回到时间复盘列表；back='subtask' → 回到子任务详情 */
+  openEditProgress(rid,back){
+    const r=this.data.progress.find(x=>x.id===rid);
+    if(!r){this.toast('找不到该记录','error');return}
+    const sub=r.subtaskId?this.subById(r.subtaskId):null;
+    const proj=this.projById(sub?sub.projectId:r.projectId);
+    this._editProgressBack=back||(this.reviewTab==='time'?'time':'subtask');
+    this.showModal('✏️ 编辑进展 · '+this.esc(sub?sub.name:(proj?proj.name:'')),
+      '<div class="form-row">'+
+        '<div class="form-group"><label>日期</label>'+
+          '<input type="date" id="pepDate" value="'+this.esc(r.date)+'"></div>'+
+        '<div class="form-group"><label>归属</label>'+
+          '<input type="text" value="'+this.esc((proj?proj.name+' / ':'')+(sub?sub.name:'项目本身'))+'" disabled style="background:var(--bg);color:var(--text-sec)"></div>'+
+      '</div>'+
+      '<div class="form-group"><label>进度 <span class="opt">*</span></label>'+
+        '<textarea id="pepProgress" style="min-height:64px">'+this.esc(r.progress||'')+'</textarea></div>'+
+      '<div class="form-group"><label>问题/阻塞</label>'+
+        '<textarea id="pepIssues" style="min-height:48px">'+this.esc(r.issues||'')+'</textarea></div>'+
+      '<div class="form-group"><label>下一步计划</label>'+
+        '<textarea id="pepNextSteps" style="min-height:48px">'+this.esc(r.nextSteps||'')+'</textarea></div>'+
+      '<div class="form-group"><label>实践手记</label>'+
+        '<textarea id="pepInsp" style="min-height:56px">'+this.esc(r.inspiration||'')+'</textarea></div>'+
+      '<div class="modal-actions">'+
+        '<button class="btn btn-ghost" onclick="App.closeModal()">取消</button>'+
+        '<button class="btn btn-primary" onclick="App.saveEditProgress(\''+rid+'\')">保存</button>'+
+      '</div>');
+    setTimeout(function(){var el=document.getElementById('pepProgress');if(el)el.focus()},100);
+  },
+
+  saveEditProgress(rid){
+    const r=this.data.progress.find(x=>x.id===rid);
+    if(!r){this.toast('找不到该记录','error');return}
+    const progress=document.getElementById('pepProgress').value.trim();
+    if(!progress){this.toast('请填写进度内容','error');return}
+    const date=(document.getElementById('pepDate').value||'').trim()||r.date;
+    const issues=document.getElementById('pepIssues').value.trim();
+    const nextSteps=document.getElementById('pepNextSteps').value.trim();
+    const inspiration=document.getElementById('pepInsp').value.trim();
+    Object.assign(r,{progress,date,issues,nextSteps,inspiration});
+    this.saveData();this.closeModal();
+    this.toast('进展已更新','success');
+    const back=this._editProgressBack||'subtask';
+    this._editProgressBack=null;
+    if(back==='time')this.applyReviewFilter();
+    else this.renderSubtaskDetail();
   },
 
   /* ---- Project Review ---- */
@@ -3400,16 +3462,16 @@ const App = {
         const sub=this.subById(r.subtaskId);
         const title=sub?sub.name:(r.subtaskId===null?'📁 项目进度':'');
         return '<div class="tl-card">'+
-          '<div class="tl-meta">'+
-            '<div class="tl-body" style="flex:1">'+
-            (title?'<p style="font-weight:600;font-size:12px;color:var(--text-sec);margin-bottom:4px">'+this.esc(title)+'</p>':'')+
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">'+
+            '<span class="tl-date">'+this.fmtDateFull(r.date)+'</span>'+
+            (title?'<span style="font-weight:600;font-size:12px;color:var(--text-sec)">'+this.esc(title)+'</span>':'')+
+          '</div>'+
+          '<div class="tl-body">'+
             (r.progress&&r.progress!=='无更新'?'<p style="display:flex;align-items:flex-start"><span class="fl" style="color:var(--text)">进度：</span><span>'+this.escNl(r.progress)+'</span></p>':'')+
             (r.progress==='无更新'?'<p style="color:var(--text-light);font-style:italic">无更新</p>':'')+
             (r.issues?'<p style="display:flex;align-items:flex-start"><span class="fl" style="color:var(--danger)">问题：</span><span>'+this.escNl(r.issues)+'</span></p>':'')+
             (r.nextSteps?'<p style="display:flex;align-items:flex-start"><span class="fl" style="color:var(--info)">下一步：</span><span>'+this.escNl(r.nextSteps)+'</span></p>':'')+
             (r.inspiration?'<p style="display:flex;align-items:flex-start"><span class="fl" style="color:var(--warning)">实践手记：</span><span>'+this.escNl(r.inspiration)+'</span></p>':'')+
-            '</div>'+
-            '<span class="tl-date" style="margin-left:12px;flex-shrink:0">'+this.fmtDateFull(r.date)+'</span>'+
           '</div>'+
         '</div>';
       }).join(''):'<div class="empty"><div class="text">暂无进展记录</div></div>')+
@@ -3498,54 +3560,21 @@ const App = {
         '</select></div>'+
       '<div class="modal-actions">'+
         '<button class="btn btn-ghost" onclick="App.closeModal()">取消</button>'+
-        '<button class="btn btn-primary" onclick="App.sdSaveProgress(null,\''+sid+'\',\''+pid+'\')">保存</button>'+
+        '<button class="btn btn-primary" onclick="App.sdSaveProgress(\''+sid+'\',\''+pid+'\')">保存</button>'+
       '</div>');
     setTimeout(function(){var el=document.getElementById('sdpProgress');if(el)el.focus();},100);
   },
 
-  /* Subtask detail: edit existing progress record */
-  sdEditProgress(rid,sid,pid){
-    const r=this.data.progress.find(x=>x.id===rid);
-    if(!r){this.toast('找不到该记录','error');return}
-    var existingInsp='';
-    if(r){
-      var parts2=[];
-      if(r.issues)parts2.push(r.issues);
-      if(r.inspiration)parts2.push(r.inspiration);
-      existingInsp=parts2.join('\n\n');
-    }
-    this.showModal('✏️ 编辑进展（'+this.fmtDateFull(r.date)+'）',
-      '<div class="form-group"><label>进度 <span class="opt">*</span></label>'+
-        '<textarea id="sdpProgress" style="min-height:64px">'+this.esc(r.progress||'')+'</textarea></div>'+
-      '<div class="form-group"><label>实践手记</label>'+
-        '<textarea id="sdpInsp" style="min-height:60px">'+this.esc(existingInsp)+'</textarea></div>'+
-      '<div class="form-group"><label>下一步计划</label>'+
-        '<textarea id="sdpNextSteps" style="min-height:48px">'+this.esc(r.nextSteps||'')+'</textarea></div>'+
-      '<div class="form-group"><label>记录类型</label>'+
-        '<select id="sdpInspType">'+
-          this.getThoughtTypes().map(t=>'<option value="'+t.key+'">'+t.icon+' '+t.label+'</option>').join('')+
-        '</select></div>'+
-      '<div class="modal-actions">'+
-        '<button class="btn btn-ghost" onclick="App.closeModal()">取消</button>'+
-        '<button class="btn btn-primary" onclick="App.sdSaveProgress(\''+rid+'\',\''+sid+'\',\''+pid+'\')">保存</button>'+
-      '</div>');
-  },
-
-  sdSaveProgress(rid,sid,pid){
+  sdSaveProgress(sid,pid){
     const prog=document.getElementById('sdpProgress').value.trim();
     if(!prog){this.toast('请填写进度内容','error');return}
     const inspiration=document.getElementById('sdpInsp').value.trim();
     const nextSteps=document.getElementById('sdpNextSteps').value.trim();
     const data={progress:prog,issues:'',nextSteps,inspiration};
-    if(rid){
-      const r=this.data.progress.find(x=>x.id===rid);
-      if(r)Object.assign(r,data);
-    }else{
-      const sub=this.subById(sid);
-      const proj=this.projById(pid);
-      this.data.progress.push({id:this.uid(),subtaskId:sid,projectId:pid,date:this.today(),
-        ...data,category:proj?proj.category:'',task:proj?proj.task:''});
-    }
+    const sub=this.subById(sid);
+    const proj=this.projById(pid);
+    this.data.progress.push({id:this.uid(),subtaskId:sid,projectId:pid,date:this.today(),
+      ...data,category:proj?proj.category:'',task:proj?proj.task:''});
 
     // Create thought entry if inspiration exists
     if(inspiration){
@@ -3561,7 +3590,7 @@ const App = {
     }
 
     this.saveData();this.closeModal();
-    this.toast(rid?'进展已更新':'进展已记录','success');
+    this.toast('进展已记录','success');
     this.renderSubtaskDetail();
   },
 
@@ -3603,18 +3632,16 @@ const App = {
         '</div>'+
       (progs.length?progs.map(r=>{
         return '<div class="tl-card">'+
-          '<div class="tl-meta">'+
-            '<div class="tl-body" style="flex:1">'+
+          '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px">'+
+            '<span class="tl-date">'+this.fmtDateFull(r.date)+'</span>'+
+            '<button class="btn btn-ghost btn-sm" style="font-size:11px;padding:2px 8px;flex-shrink:0" onclick="App.openEditProgress(\''+r.id+'\',\'subtask\')">编辑</button>'+
+          '</div>'+
+          '<div class="tl-body">'+
             (r.progress&&r.progress!=='无更新'?'<p style="display:flex;align-items:flex-start"><span class="fl" style="color:var(--text)">进度：</span><span>'+this.escNl(r.progress)+'</span></p>':'')+
             (r.progress==='无更新'?'<p style="color:var(--text-light);font-style:italic">无更新</p>':'')+
             (r.issues?'<p style="display:flex;align-items:flex-start"><span class="fl" style="color:var(--danger)">问题：</span><span>'+this.escNl(r.issues)+'</span></p>':'')+
             (r.nextSteps?'<p style="display:flex;align-items:flex-start"><span class="fl" style="color:var(--info)">下一步：</span><span>'+this.escNl(r.nextSteps)+'</span></p>':'')+
             (r.inspiration?'<p style="display:flex;align-items:flex-start"><span class="fl" style="color:var(--warning)">实践手记：</span><span>'+this.escNl(r.inspiration)+'</span></p>':'')+
-            '</div>'+
-            '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;margin-left:12px;flex-shrink:0">'+
-              '<span class="tl-date">'+this.fmtDateFull(r.date)+'</span>'+
-              '<button class="btn btn-ghost btn-sm" style="font-size:11px;padding:2px 8px" onclick="App.sdEditProgress(\''+r.id+'\',\''+s.id+'\',\''+p.id+'\')">编辑</button>'+
-            '</div>'+
           '</div>'+
         '</div>';
       }).join(''):'<div class="empty"><div class="text">暂无进展记录</div></div>')+
