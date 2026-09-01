@@ -1398,7 +1398,10 @@ const App = {
             '<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">'+this.esc(t.title)+'</div>'+
             '<div style="font-size:11px;color:var(--text-light)">'+(sub?sub.name:'')+(overdue?' · <span style="color:var(--danger)">超期'+this.daysAgo(t.dueDate)+'天</span>':'')+'</div>'+
             this.todoSolutionInput(t)+'</div>'+
-            '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();App.toggleTodoFromDash(\''+t.id+'\')">完成</button></div>';
+            '<div style="display:flex;align-items:center;gap:4px;flex-shrink:0">'+
+              this.todoSolutionToggleBtn(t)+
+              '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();App.toggleTodoFromDash(\''+t.id+'\')">完成</button>'+
+            '</div></div>';
         }).join('')+
         '</div></div>';
     });
@@ -1419,7 +1422,10 @@ const App = {
             '<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">'+this.esc(t.title)+'</div>'+
             '<div style="font-size:11px;color:var(--text-light)">未绑定'+(overdue?' · <span style="color:var(--danger)">超期'+this.daysAgo(t.dueDate)+'天</span>':'')+'</div>'+
             this.todoSolutionInput(t)+'</div>'+
-            '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();App.toggleTodoFromDash(\''+t.id+'\')">完成</button></div>';
+            '<div style="display:flex;align-items:center;gap:4px;flex-shrink:0">'+
+              this.todoSolutionToggleBtn(t)+
+              '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();App.toggleTodoFromDash(\''+t.id+'\')">完成</button>'+
+            '</div></div>';
         }).join('')+
         '</div></div>';
     }
@@ -2019,7 +2025,10 @@ const App = {
           '<div style="flex:1"><div style="font-weight:600;font-size:13px;'+(t.status==='completed'?'text-decoration:line-through;color:var(--text-light)':'')+'">'+this.esc(t.title)+'</div>'+
           '<div style="font-size:11px;color:var(--text-light)">'+(proj?proj.name+(sub?' / '+sub.name:''):'未绑定')+(isOverdue?' · <span style="color:var(--danger);white-space:nowrap">超期'+this.daysAgo(t.dueDate)+'天</span>':'')+'</div>'+
           this.todoSolutionInput(t)+'</div>'+
-          (t.status==='pending'?'<button class="btn btn-primary btn-sm" onclick="App.toggleTodoFromDash(\''+t.id+'\')">完成</button>':'')+
+          '<div style="display:flex;align-items:center;gap:4px;flex-shrink:0">'+
+            this.todoSolutionToggleBtn(t)+
+            (t.status==='pending'?'<button class="btn btn-primary btn-sm" onclick="App.toggleTodoFromDash(\''+t.id+'\')">完成</button>':'')+
+          '</div>'+
         '</div>';
       }).join(''):'<div class="empty"><div class="text">暂无星标待办</div></div>')+
       '<div class="modal-actions"><button class="btn btn-ghost" onclick="App.closeModal()">关闭</button></div>'
@@ -2143,15 +2152,31 @@ const App = {
     return '<div style="font-size:11px;color:#6D28D9;padding:6px 9px;background:#F5F3FF;border-left:3px solid #8B5CF6;border-radius:5px;margin-top:5px;white-space:pre-wrap">💡 解决方案：'+this.esc(t.resolution)+'</div>';
   },
 
-  /* 解决方案内联输入框：总览/星标弹窗中直接填写，回车或失焦保存 */
+  /* 解决方案内联输入框：默认收起，点击「方案」按钮后展开，回车或失焦保存 */
   todoSolutionInput(t){
     if(!t)return '';
-    return '<div style="margin-top:6px" onclick="event.stopPropagation()">'+
+    return '<div id="tdSolWrap_'+t.id+'" style="display:none;margin-top:6px" onclick="event.stopPropagation()">'+
       '<input type="text" value="'+this.esc(t.resolution||'')+'" placeholder="💡 填写解决方案（选填）" '+
         'onchange="App.saveTodoResolution(\''+t.id+'\',this.value)" '+
         'style="width:100%;box-sizing:border-box;font-size:11px;padding:6px 10px;border:1px solid #DDD1F0;border-radius:7px;background:#FBF9FF;color:#5B21B6;outline:none" '+
         'onfocus="this.style.borderColor=\'#8B5CF6\';this.style.background=\'#fff\'" '+
         'onblur="this.style.borderColor=\'#DDD1F0\';this.style.background=\'#FBF9FF\'"></div>';
+  },
+
+  /* 解决方案展开按钮：与「完成」按钮并排，点击展开/收起填写框；已填写时显示 ✓ */
+  todoSolutionToggleBtn(t){
+    const has=!!(t.resolution&&t.resolution.trim());
+    return '<button data-tdres="'+t.id+'" class="btn btn-ghost btn-sm" onclick="event.stopPropagation();App.toggleTodoSolution(\''+t.id+'\',this)" style="font-size:11px;white-space:nowrap" title="填写解决方案（选填）">方案'+(has?' ✓':'')+'</button>';
+  },
+
+  /* 展开/收起解决方案填写框 */
+  toggleTodoSolution(id,btn){
+    const wrap=document.getElementById('tdSolWrap_'+id);
+    if(!wrap)return;
+    const open=wrap.style.display!=='none';
+    wrap.style.display=open?'none':'block';
+    if(btn)btn.classList.toggle('btn-primary',!open);
+    if(!open){const inp=wrap.querySelector('input');if(inp)inp.focus()}
   },
 
   renderTodoCard(t,today){
@@ -2391,6 +2416,11 @@ const App = {
     t.resolution=val;
     this.saveData();
     this.toast(val?'解决方案已保存':'已清除解决方案','success');
+    /* 同步更新弹窗中「方案」按钮的已填状态 */
+    document.querySelectorAll('button[data-tdres="'+id+'"]').forEach(b=>{
+      b.textContent='方案'+(val?' ✓':'');
+      b.title=val?'解决方案已填写':'填写解决方案（选填）';
+    });
   },
 
   delTodo(id){
