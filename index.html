@@ -171,7 +171,10 @@ select option{font-size:13px;padding:2px 6px}
 .tl-card .tl-meta{margin-bottom:6px}
 .tl-card .tl-date{font-size:11px;color:var(--text-light);font-weight:500}
 .tl-card .tl-body p{font-size:13px;margin-bottom:4px;line-height:1.6}
-.tl-card .tl-body .fl{font-weight:600;font-size:12px;margin-right:4px}
+.tl-card .tl-body .fl{font-weight:600;font-size:12px;margin-right:4px;flex-shrink:0;line-height:1.6}
+.tl-card .tl-body p{overflow-wrap:anywhere}
+/* 标签行：内容区悬挂缩进，换行后与首行正文对齐 */
+.tl-card .tl-body p>span:not(.fl){flex:1;min-width:0}
 
 .quick-actions{display:flex;gap:8px;flex-wrap:nowrap;margin-bottom:7px;width:100%}
 .quick-btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 14px;border-radius:9px;background:var(--card);box-shadow:var(--shadow);cursor:pointer;transition:all .2s;border:1px solid transparent;font-size:13px;flex:1;min-width:0;white-space:nowrap}
@@ -952,6 +955,14 @@ const App = {
     setTimeout(()=>t.className='toast',2600);
   },
   esc(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')},
+  /* 转义后保留换行：把 \n / \r\n 渲染成 <br>，用于正文展示（时间线、历史、复盘卡片等） */
+  escNl(s){if(!s)return '';return this.esc(String(s).replace(/\r\n/g,'\n').replace(/\r/g,'\n')).replace(/\n/g,'<br>')},
+  /* 压平为单行文本（换行 → ·），可选截断，返回的是原始文本（未转义） */
+  flatText(s,n){let t=String(s==null?'':s).replace(/\r\n/g,'\n').replace(/\r/g,'\n')
+      .split('\n').map(x=>x.trim()).filter(x=>x!=='').join(' · ').trim();
+    if(n&&t.length>n)t=t.slice(0,n)+'…';return t},
+  /* 转义 + 压平为单行，用于单行摘要 / 带省略号的预览 */
+  escFlat(s,n){return this.esc(this.flatText(s,n))},
 
   /* ========== Navigation ========== */
   renderNav(){
@@ -1233,9 +1244,9 @@ const App = {
       const title=sub?sub.name:(proj?'📁 '+proj.name:'');
       return '<div style="padding:8px 10px;background:var(--bg);border-radius:7px;margin-bottom:6px">'+
         '<div style="font-weight:600;font-size:12px;margin-bottom:3px">'+this.esc(title)+(proj?' <span style="font-size:10px;color:var(--text-light)">'+this.esc(proj.name)+'</span>':'')+'</div>'+
-        '<div style="font-size:12px;color:var(--text-sec)">'+this.esc(r.progress||'无更新')+'</div>'+
-        (r.issues?'<div style="font-size:11px;color:var(--danger);margin-top:2px">⚠️ '+this.esc(r.issues).slice(0,60)+'</div>':'')+
-        (r.inspiration?'<div style="font-size:11px;color:var(--c-amber-tx);margin-top:2px">💡 '+this.esc(r.inspiration).slice(0,60)+'</div>':'')+
+        '<div style="font-size:12px;color:var(--text-sec)">'+this.escNl(r.progress||'无更新')+'</div>'+
+        (r.issues?'<div style="font-size:11px;color:var(--danger);margin-top:2px">⚠️ '+this.escFlat(r.issues,60)+'</div>':'')+
+        (r.inspiration?'<div style="font-size:11px;color:var(--c-amber-tx);margin-top:2px">💡 '+this.escFlat(r.inspiration,60)+'</div>':'')+
       '</div>';
     }).join('');
     html+='<div class="modal-actions"><button class="btn btn-ghost" onclick="App.closeModal()">关闭</button><button class="btn btn-primary" onclick="App.closeModal();App.navigate(\'progress\')">前往填报</button></div>';
@@ -1249,13 +1260,13 @@ const App = {
     if(a.type==='progress'){
       const sub=this.subById(a.data.subtaskId);
       title=sub?sub.name:'进度更新';
-      desc=a.data.progress||a.data.inspiration||a.data.issues||'无更新';
+      desc=this.flatText(a.data.progress||a.data.inspiration||a.data.issues||'无更新');
     }else if(a.type==='todo'){
       title=a.data.title;
       desc='完成待办'+(a.data.subtaskId?' · '+this.subById(a.data.subtaskId)?.name:'');
     }else if(a.type==='thought'){
       title=a.data.title||a.data.type;
-      desc=a.data.content.slice(0,100)+(a.data.content.length>100?'...':'');
+      desc=this.flatText(a.data.content,100);
     }
     const iconStr=a.type==='thought'?this.thoughtIcon(a.data.type):icons[a.type];
     const colorStr=a.type==='thought'?(a.data.type==='踩坑记录'?'var(--c-rose-bg)':'var(--c-amber-bg)'):colors[a.type];
@@ -1435,7 +1446,7 @@ const App = {
         const proj=this.projById(r.projectId);
         return '<div style="padding:10px 12px;background:var(--bg);border-radius:8px;margin-bottom:8px">'+
           '<div style="font-weight:600;font-size:13px">'+(sub?sub.name:'📁 '+proj?.name)+' <span style="font-size:11px;color:var(--text-light)">'+proj?.name+' · '+r.task+'</span></div>'+
-          '<div style="font-size:12px;color:var(--text-sec);margin-top:4px">'+this.esc(r.progress||'无更新')+'</div>'+
+          '<div style="font-size:12px;color:var(--text-sec);margin-top:4px">'+this.escNl(r.progress||'无更新')+'</div>'+
           '</div>';
       }).join(''):'<div class="empty"><div class="text">今日暂无填报</div></div>')+
       '<div class="modal-actions"><button class="btn btn-ghost" onclick="App.closeModal()">关闭</button><button class="btn btn-primary" onclick="App.closeModal();App.navigate(\'progress\')">去填报</button></div>'
@@ -1466,7 +1477,7 @@ const App = {
         const prog=this.progBySub(s.id)[0];
         const days=prog?this.daysAgo(prog.date):null;
         const lastDate=prog?this.fmtDateFull(prog.date):'从未填报';
-        const lastProgress=prog?this.esc((prog.progress||'无更新').slice(0,60)):'';
+        const lastProgress=prog?this.escFlat(prog.progress||'无更新',60):'';
         return '<div style="padding:10px 12px;background:var(--bg);border-radius:8px;margin-bottom:8px;cursor:pointer" onclick="App.closeModal();App.navigate(\'progress\');setTimeout(function(){App.dailyIdx=App.dailyItems().findIndex(function(i){return i._type===\'subtask\'&&i.id===\''+s.id+'\'});App.renderDailyFormPage()},50)">'+
           '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'+
             '<span class="tag '+this.catCls(proj?.category||'')+'" style="'+this.catTagStyle(proj?.category||'')+'">'+this.catLabel(proj?.category||'')+'</span>'+
@@ -1918,11 +1929,11 @@ const App = {
             '<span style="font-size:11px;color:var(--text-light)">'+proj.name+'</span>'+
             '<span class="tl-date" style="margin-left:auto">'+this.fmtDateFull(r.date)+'</span>'+
           '</div>'+
-          (r.progress&&r.progress!=='无更新'?'<p><span class="fl" style="color:var(--text)">进度：</span>'+this.esc(r.progress)+'</p>':'')+
+          (r.progress&&r.progress!=='无更新'?'<p style="display:flex;align-items:flex-start"><span class="fl" style="color:var(--text)">进度：</span><span>'+this.escNl(r.progress)+'</span></p>':'')+
           (r.progress==='无更新'?'<p style="color:var(--text-light);font-style:italic">无更新</p>':'')+
-          (r.issues?'<p><span class="fl" style="color:var(--danger)">问题：</span>'+this.esc(r.issues)+'</p>':'')+
-          (r.nextSteps?'<p><span class="fl" style="color:var(--info)">下一步：</span>'+this.esc(r.nextSteps)+'</p>':'')+
-          (r.inspiration?'<p><span class="fl" style="color:var(--warning)">实践手记：</span>'+this.esc(r.inspiration)+'</p>':'')+
+          (r.issues?'<p style="display:flex;align-items:flex-start"><span class="fl" style="color:var(--danger)">问题：</span><span>'+this.escNl(r.issues)+'</span></p>':'')+
+          (r.nextSteps?'<p style="display:flex;align-items:flex-start"><span class="fl" style="color:var(--info)">下一步：</span><span>'+this.escNl(r.nextSteps)+'</span></p>':'')+
+          (r.inspiration?'<p style="display:flex;align-items:flex-start"><span class="fl" style="color:var(--warning)">实践手记：</span><span>'+this.escNl(r.inspiration)+'</span></p>':'')+
           '</div>'+
         '</div>'+
       '</div>';
@@ -3073,10 +3084,10 @@ const App = {
               '<span style="font-size:11px;color:var(--text-light)">'+(proj?.name||'')+' · '+p.task+'</span>'+
               '<span style="margin-left:auto;font-size:11px;color:var(--text-light)">'+this.fmtDateFull(p.date)+'</span>'+
             '</div>'+
-            '<div style="font-size:13px;color:var(--text-sec);margin-bottom:4px">'+this.esc(p.progress||'无更新')+'</div>'+
+            '<div style="font-size:13px;color:var(--text-sec);margin-bottom:4px">'+this.escNl(p.progress||'无更新')+'</div>'+
             '<div class="prc-stats">'+
-              (p.issues?'<span style="color:var(--danger)">⚠️ '+this.esc(p.issues).slice(0,50)+'</span>':'')+
-              (p.nextSteps?'<span style="color:var(--info)">→ '+this.esc(p.nextSteps).slice(0,40)+'</span>':'')+
+              (p.issues?'<span style="color:var(--danger)">⚠️ '+this.escFlat(p.issues,50)+'</span>':'')+
+              (p.nextSteps?'<span style="color:var(--info)">→ '+this.escFlat(p.nextSteps,40)+'</span>':'')+
               (p.inspiration?'<span style="color:var(--c-amber-tx)">💡 有手记</span>':'')+
             '</div>'+
           '</div>';
@@ -3392,11 +3403,11 @@ const App = {
           '<div class="tl-meta">'+
             '<div class="tl-body" style="flex:1">'+
             (title?'<p style="font-weight:600;font-size:12px;color:var(--text-sec);margin-bottom:4px">'+this.esc(title)+'</p>':'')+
-            (r.progress&&r.progress!=='无更新'?'<p><span class="fl" style="color:var(--text)">进度：</span>'+this.esc(r.progress)+'</p>':'')+
+            (r.progress&&r.progress!=='无更新'?'<p style="display:flex;align-items:flex-start"><span class="fl" style="color:var(--text)">进度：</span><span>'+this.escNl(r.progress)+'</span></p>':'')+
             (r.progress==='无更新'?'<p style="color:var(--text-light);font-style:italic">无更新</p>':'')+
-            (r.issues?'<p><span class="fl" style="color:var(--danger)">问题：</span>'+this.esc(r.issues)+'</p>':'')+
-            (r.nextSteps?'<p><span class="fl" style="color:var(--info)">下一步：</span>'+this.esc(r.nextSteps)+'</p>':'')+
-            (r.inspiration?'<p><span class="fl" style="color:var(--warning)">实践手记：</span>'+this.esc(r.inspiration)+'</p>':'')+
+            (r.issues?'<p style="display:flex;align-items:flex-start"><span class="fl" style="color:var(--danger)">问题：</span><span>'+this.escNl(r.issues)+'</span></p>':'')+
+            (r.nextSteps?'<p style="display:flex;align-items:flex-start"><span class="fl" style="color:var(--info)">下一步：</span><span>'+this.escNl(r.nextSteps)+'</span></p>':'')+
+            (r.inspiration?'<p style="display:flex;align-items:flex-start"><span class="fl" style="color:var(--warning)">实践手记：</span><span>'+this.escNl(r.inspiration)+'</span></p>':'')+
             '</div>'+
             '<span class="tl-date" style="margin-left:12px;flex-shrink:0">'+this.fmtDateFull(r.date)+'</span>'+
           '</div>'+
@@ -3594,11 +3605,11 @@ const App = {
         return '<div class="tl-card">'+
           '<div class="tl-meta">'+
             '<div class="tl-body" style="flex:1">'+
-            (r.progress&&r.progress!=='无更新'?'<p><span class="fl" style="color:var(--text)">进度：</span>'+this.esc(r.progress)+'</p>':'')+
+            (r.progress&&r.progress!=='无更新'?'<p style="display:flex;align-items:flex-start"><span class="fl" style="color:var(--text)">进度：</span><span>'+this.escNl(r.progress)+'</span></p>':'')+
             (r.progress==='无更新'?'<p style="color:var(--text-light);font-style:italic">无更新</p>':'')+
-            (r.issues?'<p><span class="fl" style="color:var(--danger)">问题：</span>'+this.esc(r.issues)+'</p>':'')+
-            (r.nextSteps?'<p><span class="fl" style="color:var(--info)">下一步：</span>'+this.esc(r.nextSteps)+'</p>':'')+
-            (r.inspiration?'<p><span class="fl" style="color:var(--warning)">实践手记：</span>'+this.esc(r.inspiration)+'</p>':'')+
+            (r.issues?'<p style="display:flex;align-items:flex-start"><span class="fl" style="color:var(--danger)">问题：</span><span>'+this.escNl(r.issues)+'</span></p>':'')+
+            (r.nextSteps?'<p style="display:flex;align-items:flex-start"><span class="fl" style="color:var(--info)">下一步：</span><span>'+this.escNl(r.nextSteps)+'</span></p>':'')+
+            (r.inspiration?'<p style="display:flex;align-items:flex-start"><span class="fl" style="color:var(--warning)">实践手记：</span><span>'+this.escNl(r.inspiration)+'</span></p>':'')+
             '</div>'+
             '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;margin-left:12px;flex-shrink:0">'+
               '<span class="tl-date">'+this.fmtDateFull(r.date)+'</span>'+
